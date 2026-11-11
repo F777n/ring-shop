@@ -49,10 +49,6 @@ class ProductFormScreen extends StatelessWidget {
     final brandList = await brands.all();
     final categoryList = await categories.all();
     final disciplineList = await disciplines.all();
-    final taken = (await products.all())
-        .where((item) => item.id != id)
-        .map((item) => item.sku)
-        .toList();
     final values = <String, Object?>{
       'name': product?.name ?? '',
       'sku': product?.sku ?? '',
@@ -69,7 +65,7 @@ class ProductFormScreen extends StatelessWidget {
       title: id == null ? 'Новый товар' : 'Изменение товара',
       submitLabel: id == null ? 'Создать' : 'Сохранить',
       values: values,
-      fields: (current) => _fields(current, brandList, categoryList, disciplineList, taken),
+      fields: (current) => _fields(current, brandList, categoryList, disciplineList),
     );
   }
 
@@ -87,9 +83,6 @@ class ProductFormScreen extends StatelessWidget {
       stockTotal: int.parse(textValue(values, 'stockTotal')),
       stockAvailable: int.parse(textValue(values, 'stockAvailable')),
     );
-    if (await products.isSkuTaken(draft.sku, exceptId: id)) {
-      throw StateError('Такой артикул уже есть.');
-    }
     if (id == null) {
       final created = await products.create(draft);
       return created.id;
@@ -128,7 +121,6 @@ List<FieldSpec> _fields(
   List<Brand> brands,
   List<Category> categories,
   List<Discipline> disciplines,
-  List<String> takenSkus,
 ) {
   final brandId = intValue(values, 'brandId');
   final allowed = _brandCategories(brandId, brands);
@@ -162,7 +154,7 @@ List<FieldSpec> _fields(
       hint: 'EV-GL-10',
       initialValue: textValue(values, 'sku'),
       style: skuTextStyle,
-      validator: (value, _) => skuText(value) ?? uniqueValue(value, takenSkus, 'Такой артикул уже есть'),
+      validator: (value, _) => skuText(value),
     ),
     TextFieldSpec(
       id: 'year',

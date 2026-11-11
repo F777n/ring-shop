@@ -1,0 +1,1038 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Перчатки тренировочные Everlast Powerlock",
+      "sku": "EV-GL-10",
+      "year": 2022,
+      "priceRub": 8990,
+      "weightGrams": 397,
+      "brandId": 1,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 20,
+      "stockAvailable": 14,
+      "deletedAt": null
+    },
+    {
+      "id": 2,
+      "name": "Защита паха Everlast Elite",
+      "sku": "EV-GR-01",
+      "year": 2021,
+      "priceRub": 4590,
+      "weightGrams": 280,
+      "brandId": 1,
+      "categoryIds": [
+        8
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 15,
+      "stockAvailable": 9,
+      "deletedAt": null
+    },
+    {
+      "id": 3,
+      "name": "Перчатки Rival RB50",
+      "sku": "RV-GL-50",
+      "year": 2023,
+      "priceRub": 12490,
+      "weightGrams": 410,
+      "brandId": 2,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 12,
+      "stockAvailable": 7,
+      "deletedAt": null
+    },
+    {
+      "id": 4,
+      "name": "Шлем Rival Guerrero",
+      "sku": "RV-HL-02",
+      "year": 2020,
+      "priceRub": 9990,
+      "weightGrams": 680,
+      "brandId": 2,
+      "categoryIds": [
+        4
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 10,
+      "stockAvailable": 4,
+      "deletedAt": null
+    },
+    {
+      "id": 5,
+      "name": "Перчатки Winning MS-600",
+      "sku": "WN-GL-600",
+      "year": 2024,
+      "priceRub": 54900,
+      "weightGrams": 360,
+      "brandId": 3,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 6,
+      "stockAvailable": 2,
+      "deletedAt": null
+    },
+    {
+      "id": 6,
+      "name": "Бинты Winning полуэластичные",
+      "sku": "WN-WR-290",
+      "year": 2024,
+      "priceRub": 3900,
+      "weightGrams": 90,
+      "brandId": 3,
+      "categoryIds": [
+        2
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 40,
+      "stockAvailable": 31,
+      "deletedAt": null
+    },
+    {
+      "id": 7,
+      "name": "Перчатки Cleto Reyes Extra",
+      "sku": "CR-GL-EX",
+      "year": 2019,
+      "priceRub": 18990,
+      "weightGrams": 425,
+      "brandId": 4,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 8,
+      "stockAvailable": 3,
+      "deletedAt": null
+    },
+    {
+      "id": 8,
+      "name": "Капа Cleto Reyes",
+      "sku": "CR-MG-01",
+      "year": 2022,
+      "priceRub": 2490,
+      "weightGrams": 40,
+      "brandId": 4,
+      "categoryIds": [
+        3
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 50,
+      "stockAvailable": 44,
+      "deletedAt": null
+    },
+    {
+      "id": 9,
+      "name": "Перчатки Adidas Speed Tilt 350",
+      "sku": "AD-GL-350",
+      "year": 2023,
+      "priceRub": 10990,
+      "weightGrams": 390,
+      "brandId": 5,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 18,
+      "stockAvailable": 11,
+      "deletedAt": null
+    },
+    {
+      "id": 10,
+      "name": "Боксерки Adidas Box Hog 4",
+      "sku": "AD-SH-04",
+      "year": 2024,
+      "priceRub": 13990,
+      "weightGrams": 820,
+      "brandId": 5,
+      "categoryIds": [
+        7
+      ],
+      "disciplineIds": [
+        1,
+        2
+      ],
+      "stockTotal": 14,
+      "stockAvailable": 8,
+      "deletedAt": null
+    },
+    {
+      "id": 11,
+      "name": "Перчатки Venum Challenger 3.0",
+      "sku": "VN-GL-C3",
+      "year": 2021,
+      "priceRub": 6490,
+      "weightGrams": 370,
+      "brandId": 6,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1,
+        4
+      ],
+      "stockTotal": 22,
+      "stockAvailable": 16,
+      "deletedAt": null
+    },
+    {
+      "id": 12,
+      "name": "Шлем Venum Elite",
+      "sku": "VN-HL-EL",
+      "year": 2022,
+      "priceRub": 7990,
+      "weightGrams": 640,
+      "brandId": 6,
+      "categoryIds": [
+        4
+      ],
+      "disciplineIds": [
+        1,
+        4
+      ],
+      "stockTotal": 11,
+      "stockAvailable": 5,
+      "deletedAt": null
+    },
+    {
+      "id": 13,
+      "name": "Бинты Venum Kontact 4 м",
+      "sku": "VN-WR-4M",
+      "year": 2020,
+      "priceRub": 1290,
+      "weightGrams": 80,
+      "brandId": 6,
+      "categoryIds": [
+        2
+      ],
+      "disciplineIds": [
+        1,
+        4
+      ],
+      "stockTotal": 60,
+      "stockAvailable": 52,
+      "deletedAt": null
+    },
+    {
+      "id": 14,
+      "name": "Груша Title Genuine Leather",
+      "sku": "TL-BG-70",
+      "year": 2018,
+      "priceRub": 15990,
+      "weightGrams": 32000,
+      "brandId": 7,
+      "categoryIds": [
+        5
+      ],
+      "disciplineIds": [
+        1,
+        7
+      ],
+      "stockTotal": 5,
+      "stockAvailable": 2,
+      "deletedAt": null
+    },
+    {
+      "id": 15,
+      "name": "Капа Title Gel",
+      "sku": "TL-MG-01",
+      "year": 2023,
+      "priceRub": 990,
+      "weightGrams": 35,
+      "brandId": 7,
+      "categoryIds": [
+        3
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 70,
+      "stockAvailable": 61,
+      "deletedAt": null
+    },
+    {
+      "id": 16,
+      "name": "Перчатки Green Hill Tiger",
+      "sku": "GH-GL-TG",
+      "year": 2022,
+      "priceRub": 3490,
+      "weightGrams": 380,
+      "brandId": 8,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 30,
+      "stockAvailable": 21,
+      "deletedAt": null
+    },
+    {
+      "id": 17,
+      "name": "Лапы Green Hill Coach",
+      "sku": "GH-LP-01",
+      "year": 2021,
+      "priceRub": 4990,
+      "weightGrams": 900,
+      "brandId": 8,
+      "categoryIds": [
+        6
+      ],
+      "disciplineIds": [
+        1,
+        7
+      ],
+      "stockTotal": 16,
+      "stockAvailable": 10,
+      "deletedAt": null
+    },
+    {
+      "id": 18,
+      "name": "Набор Fairtex: перчатки и бинты",
+      "sku": "FX-SET-01",
+      "year": 2019,
+      "priceRub": 9190,
+      "weightGrams": 480,
+      "brandId": 9,
+      "categoryIds": [
+        1,
+        2
+      ],
+      "disciplineIds": [
+        1,
+        3
+      ],
+      "stockTotal": 13,
+      "stockAvailable": 6,
+      "deletedAt": null
+    },
+    {
+      "id": 19,
+      "name": "Мешок Fairtex HB6",
+      "sku": "FX-BG-H6",
+      "year": 2017,
+      "priceRub": 21990,
+      "weightGrams": 28000,
+      "brandId": 9,
+      "categoryIds": [
+        5
+      ],
+      "disciplineIds": [
+        1,
+        3,
+        7
+      ],
+      "stockTotal": 4,
+      "stockAvailable": 1,
+      "deletedAt": null
+    },
+    {
+      "id": 20,
+      "name": "Перчатки Twins Special BGVL3",
+      "sku": "TW-GL-L3",
+      "year": 2020,
+      "priceRub": 7490,
+      "weightGrams": 405,
+      "brandId": 10,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1,
+        3
+      ],
+      "stockTotal": 17,
+      "stockAvailable": 9,
+      "deletedAt": null
+    },
+    {
+      "id": 21,
+      "name": "Лапы Twins Special",
+      "sku": "TW-LP-01",
+      "year": 2016,
+      "priceRub": 8690,
+      "weightGrams": 1100,
+      "brandId": 10,
+      "categoryIds": [
+        6
+      ],
+      "disciplineIds": [
+        1,
+        3,
+        7
+      ],
+      "stockTotal": 9,
+      "stockAvailable": 4,
+      "deletedAt": null
+    },
+    {
+      "id": 22,
+      "name": "Перчатки Hayabusa T3",
+      "sku": "HY-GL-T3",
+      "year": 2024,
+      "priceRub": 19990,
+      "weightGrams": 430,
+      "brandId": 11,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 10,
+      "stockAvailable": 6,
+      "deletedAt": null
+    },
+    {
+      "id": 23,
+      "name": "Шлем Hayabusa",
+      "sku": "HY-HL-01",
+      "year": 2023,
+      "priceRub": 11490,
+      "weightGrams": 700,
+      "brandId": 11,
+      "categoryIds": [
+        4
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 8,
+      "stockAvailable": 3,
+      "deletedAt": null
+    },
+    {
+      "id": 24,
+      "name": "Перчатки Leone 1947 Iconic",
+      "sku": "LE-GL-IC",
+      "year": 2015,
+      "priceRub": 9690,
+      "weightGrams": 415,
+      "brandId": 12,
+      "categoryIds": [
+        1
+      ],
+      "disciplineIds": [
+        1
+      ],
+      "stockTotal": 7,
+      "stockAvailable": 0,
+      "deletedAt": null
+    },
+    {
+      "id": 25,
+      "name": "Боксерки Leone Premium",
+      "sku": "LE-SH-PR",
+      "year": 2018,
+      "priceRub": 12990,
+      "weightGrams": 780,
+      "brandId": 12,
+      "categoryIds": [
+        7
+      ],
+      "disciplineIds": [
+        1,
+        2
+      ],
+      "stockTotal": 6,
+      "stockAvailable": 2,
+      "deletedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "id": 26,
+      "name": "Груша Everlast Nevatear",
+      "sku": "EV-BG-NV",
+      "year": 2016,
+      "priceRub": 24990,
+      "weightGrams": 35000,
+      "brandId": 1,
+      "categoryIds": [
+        5
+      ],
+      "disciplineIds": [
+        1,
+        7
+      ],
+      "stockTotal": 3,
+      "stockAvailable": 1,
+      "deletedAt": "2026-01-15T00:00:00.000Z"
+    }
+  ],
+  "brands": [
+    {
+      "id": 1,
+      "name": "Everlast",
+      "country": "США",
+      "foundedYear": 1910,
+      "specialization": "Перчатки и снаряды",
+      "email": "everlast@ring.shop",
+      "categoryIds": [
+        1,
+        5,
+        8
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 2,
+      "name": "Rival",
+      "country": "Канада",
+      "foundedYear": 1987,
+      "specialization": "Соревновательная экипировка",
+      "email": "rival@ring.shop",
+      "categoryIds": [
+        1,
+        4
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 3,
+      "name": "Winning",
+      "country": "Япония",
+      "foundedYear": 1937,
+      "specialization": "Профессиональные перчатки",
+      "email": "winning@ring.shop",
+      "categoryIds": [
+        1,
+        2
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 4,
+      "name": "Cleto Reyes",
+      "country": "Мексика",
+      "foundedYear": 1973,
+      "specialization": "Перчатки и капы",
+      "email": "cleto@ring.shop",
+      "categoryIds": [
+        1,
+        3
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 5,
+      "name": "Adidas",
+      "country": "Германия",
+      "foundedYear": 1949,
+      "specialization": "Обувь и тренировки",
+      "email": "adidas@ring.shop",
+      "categoryIds": [
+        1,
+        7
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 6,
+      "name": "Venum",
+      "country": "Франция",
+      "foundedYear": 2006,
+      "specialization": "Экипировка для зала",
+      "email": "venum@ring.shop",
+      "categoryIds": [
+        1,
+        2,
+        4
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 7,
+      "name": "Title",
+      "country": "США",
+      "foundedYear": 1963,
+      "specialization": "Груши и оснащение зала",
+      "email": "title@ring.shop",
+      "categoryIds": [
+        3,
+        5
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 8,
+      "name": "Green Hill",
+      "country": "Россия",
+      "foundedYear": 1992,
+      "specialization": "Тренировочная линейка",
+      "email": "greenhill@ring.shop",
+      "categoryIds": [
+        1,
+        6
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 9,
+      "name": "Fairtex",
+      "country": "Таиланд",
+      "foundedYear": 1971,
+      "specialization": "Тайский бокс и бокс",
+      "email": "fairtex@ring.shop",
+      "categoryIds": [
+        1,
+        2,
+        5
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 10,
+      "name": "Twins Special",
+      "country": "Таиланд",
+      "foundedYear": 1991,
+      "specialization": "Перчатки и лапы",
+      "email": "twins@ring.shop",
+      "categoryIds": [
+        1,
+        6
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 11,
+      "name": "Hayabusa",
+      "country": "Канада",
+      "foundedYear": 2005,
+      "specialization": "Защита и перчатки",
+      "email": "hayabusa@ring.shop",
+      "categoryIds": [
+        1,
+        4
+      ],
+      "deletedAt": null
+    },
+    {
+      "id": 12,
+      "name": "Leone 1947",
+      "country": "Италия",
+      "foundedYear": 1947,
+      "specialization": "Классическая экипировка",
+      "email": "leone@ring.shop",
+      "categoryIds": [
+        1,
+        7
+      ],
+      "deletedAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Перчатки",
+      "code": "GLV",
+      "description": "Снаряжение для ударов руками на тренировке и на ринге.",
+      "kind": "Защита",
+      "introducedYear": 1910,
+      "deletedAt": null
+    },
+    {
+      "id": 2,
+      "name": "Бинты",
+      "code": "WRP",
+      "description": "Фиксируют запястье и костяшки под перчаткой.",
+      "kind": "Защита",
+      "introducedYear": 1930,
+      "deletedAt": null
+    },
+    {
+      "id": 3,
+      "name": "Капы",
+      "code": "MTH",
+      "description": "Защищают зубы и челюсть во время спарринга.",
+      "kind": "Защита",
+      "introducedYear": 1950,
+      "deletedAt": null
+    },
+    {
+      "id": 4,
+      "name": "Шлемы",
+      "code": "HLM",
+      "description": "Закрывают голову на тренировочных боях.",
+      "kind": "Защита",
+      "introducedYear": 1960,
+      "deletedAt": null
+    },
+    {
+      "id": 5,
+      "name": "Груши и мешки",
+      "code": "BAG",
+      "description": "Подвесные и напольные снаряды для ударов.",
+      "kind": "Снаряды",
+      "introducedYear": 1920,
+      "deletedAt": null
+    },
+    {
+      "id": 6,
+      "name": "Лапы",
+      "code": "PAD",
+      "description": "Парные лапы для работы с тренером.",
+      "kind": "Снаряды",
+      "introducedYear": 1970,
+      "deletedAt": null
+    },
+    {
+      "id": 7,
+      "name": "Обувь",
+      "code": "SHO",
+      "description": "Боксёрки и обувь для зала.",
+      "kind": "Одежда",
+      "introducedYear": 1980,
+      "deletedAt": null
+    },
+    {
+      "id": 8,
+      "name": "Защита",
+      "code": "GRD",
+      "description": "Защита корпуса, паха и голени.",
+      "kind": "Защита",
+      "introducedYear": 1985,
+      "deletedAt": null
+    },
+    {
+      "id": 9,
+      "name": "Шорты",
+      "code": "SRT",
+      "description": "Боксёрские и тайские шорты.",
+      "kind": "Одежда",
+      "introducedYear": 1990,
+      "deletedAt": null
+    },
+    {
+      "id": 10,
+      "name": "Футболки",
+      "code": "TSH",
+      "description": "Тренировочные футболки и рашгарды.",
+      "kind": "Одежда",
+      "introducedYear": 1995,
+      "deletedAt": null
+    },
+    {
+      "id": 11,
+      "name": "Скакалки",
+      "code": "ROP",
+      "description": "Скоростные скакалки для разминки.",
+      "kind": "Снаряды",
+      "introducedYear": 2001,
+      "deletedAt": null
+    },
+    {
+      "id": 12,
+      "name": "Нагрудники",
+      "code": "CST",
+      "description": "Жёсткая защита корпуса. Позиция снята с витрины.",
+      "kind": "Защита",
+      "introducedYear": 1978,
+      "deletedAt": "2026-04-01T00:00:00.000Z"
+    }
+  ],
+  "disciplines": [
+    {
+      "id": 1,
+      "name": "Бокс",
+      "country": "Великобритания",
+      "establishedYear": 1867,
+      "summary": "Удары руками в перчатках по правилам ринга.",
+      "deletedAt": null
+    },
+    {
+      "id": 2,
+      "name": "Кикбоксинг",
+      "country": "США",
+      "establishedYear": 1974,
+      "summary": "Удары руками и ногами в полный контакт.",
+      "deletedAt": null
+    },
+    {
+      "id": 3,
+      "name": "Муай-тай",
+      "country": "Таиланд",
+      "establishedYear": 1930,
+      "summary": "Тайский бокс: локти, колени, клинч и лоу-кик.",
+      "deletedAt": null
+    },
+    {
+      "id": 4,
+      "name": "ММА",
+      "country": "США",
+      "establishedYear": 1993,
+      "summary": "Смешанные единоборства в клетке и в клетке-октагоне.",
+      "deletedAt": null
+    },
+    {
+      "id": 5,
+      "name": "Сават",
+      "country": "Франция",
+      "establishedYear": 1832,
+      "summary": "Французский бокс ногами в обуви.",
+      "deletedAt": null
+    },
+    {
+      "id": 6,
+      "name": "Рукопашный бой",
+      "country": "Россия",
+      "establishedYear": 1979,
+      "summary": "Прикладной раздел с ударами и борьбой.",
+      "deletedAt": null
+    },
+    {
+      "id": 7,
+      "name": "Общая подготовка",
+      "country": "Германия",
+      "establishedYear": 1950,
+      "summary": "ОФП, мешки, скакалка и работа на снарядах.",
+      "deletedAt": null
+    },
+    {
+      "id": 8,
+      "name": "Кудо",
+      "country": "Япония",
+      "establishedYear": 1981,
+      "summary": "Контакт в шлеме с ударами и борьбой.",
+      "deletedAt": null
+    },
+    {
+      "id": 9,
+      "name": "К-1",
+      "country": "Япония",
+      "establishedYear": 1993,
+      "summary": "Стойка кикбоксинга по правилам К-1.",
+      "deletedAt": null
+    },
+    {
+      "id": 10,
+      "name": "Самбо",
+      "country": "Россия",
+      "establishedYear": 1938,
+      "summary": "Борьба и боевое самбо в куртке.",
+      "deletedAt": null
+    },
+    {
+      "id": 11,
+      "name": "Бокс олимпийский",
+      "country": "Франция",
+      "establishedYear": 1904,
+      "summary": "Любительский бокс по олимпийской формуле.",
+      "deletedAt": null
+    },
+    {
+      "id": 12,
+      "name": "Панкратион",
+      "country": "Греция",
+      "establishedYear": 1996,
+      "summary": "Возрождённый античный раздел. Снят с витрины.",
+      "deletedAt": "2025-11-02T00:00:00.000Z"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "fullName": "Иван Петров",
+      "email": "ivan.petrov@mail.ru",
+      "phone": "+79001110001",
+      "city": "Москва",
+      "birthYear": 1994,
+      "card": {
+        "number": "100001",
+        "issuedOn": "2024-02-15",
+        "discountPercent": 5,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 2,
+      "fullName": "Мария Соколова",
+      "email": "maria.sokolova@mail.ru",
+      "phone": "+79001110002",
+      "city": "Санкт-Петербург",
+      "birthYear": 1998,
+      "card": {
+        "number": "100002",
+        "issuedOn": "2024-03-15",
+        "discountPercent": 10,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 3,
+      "fullName": "Артём Кузнецов",
+      "email": "artem.kuznetsov@mail.ru",
+      "phone": "+79001110003",
+      "city": "Казань",
+      "birthYear": 1991,
+      "card": {
+        "number": "100003",
+        "issuedOn": "2024-04-15",
+        "discountPercent": 0,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 4,
+      "fullName": "Елена Орлова",
+      "email": "elena.orlova@mail.ru",
+      "phone": "+79001110004",
+      "city": "Екатеринбург",
+      "birthYear": 1987,
+      "card": {
+        "number": "100004",
+        "issuedOn": "2024-05-15",
+        "discountPercent": 15,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 5,
+      "fullName": "Никита Волков",
+      "email": "nikita.volkov@mail.ru",
+      "phone": "+79001110005",
+      "city": "Новосибирск",
+      "birthYear": 2001,
+      "card": {
+        "number": "100005",
+        "issuedOn": "2024-06-15",
+        "discountPercent": 5,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 6,
+      "fullName": "Ольга Белова",
+      "email": "olga.belova@mail.ru",
+      "phone": "+79001110006",
+      "city": "Краснодар",
+      "birthYear": 1996,
+      "card": {
+        "number": "100006",
+        "issuedOn": "2024-07-15",
+        "discountPercent": 10,
+        "active": false
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 7,
+      "fullName": "Павел Морозов",
+      "email": "pavel.morozov@mail.ru",
+      "phone": "+79001110007",
+      "city": "Москва",
+      "birthYear": 1984,
+      "card": {
+        "number": "100007",
+        "issuedOn": "2024-08-15",
+        "discountPercent": 20,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 8,
+      "fullName": "Дарья Лебедева",
+      "email": "darya.lebedeva@mail.ru",
+      "phone": "+79001110008",
+      "city": "Казань",
+      "birthYear": 2003,
+      "card": {
+        "number": "100008",
+        "issuedOn": "2024-09-15",
+        "discountPercent": 5,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 9,
+      "fullName": "Сергей Новиков",
+      "email": "sergey.novikov@mail.ru",
+      "phone": "+79001110009",
+      "city": "Санкт-Петербург",
+      "birthYear": 1979,
+      "card": {
+        "number": "100009",
+        "issuedOn": "2024-01-15",
+        "discountPercent": 15,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 10,
+      "fullName": "Алина Ким",
+      "email": "alina.kim@mail.ru",
+      "phone": "+79001110010",
+      "city": "Екатеринбург",
+      "birthYear": 1999,
+      "card": {
+        "number": "100010",
+        "issuedOn": "2024-02-15",
+        "discountPercent": 0,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 11,
+      "fullName": "Глеб Сафин",
+      "email": "gleb.safin@mail.ru",
+      "phone": "+79001110011",
+      "city": "Краснодар",
+      "birthYear": 1992,
+      "card": {
+        "number": "100011",
+        "issuedOn": "2024-03-15",
+        "discountPercent": 10,
+        "active": true
+      },
+      "deletedAt": null
+    },
+    {
+      "id": 12,
+      "fullName": "Кирилл Ершов",
+      "email": "kirill.ershov@mail.ru",
+      "phone": "+79001110012",
+      "city": "Новосибирск",
+      "birthYear": 1988,
+      "card": {
+        "number": "100012",
+        "issuedOn": "2024-04-15",
+        "discountPercent": 5,
+        "active": true
+      },
+      "deletedAt": "2026-05-01T00:00:00.000Z"
+    }
+  ]
+}

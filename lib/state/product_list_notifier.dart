@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/api_exceptions.dart';
 import '../data/catalog.dart';
 import '../models/brand.dart';
 import '../models/category.dart';
@@ -78,6 +79,12 @@ class ProductListNotifier extends ChangeNotifier {
       if (ticket != _ticket) return;
       _result = result;
       _status = LoadStatus.success;
+    } on RequestCancelled {
+      return;
+    } on ApiException catch (error) {
+      if (ticket != _ticket) return;
+      _error = error.message;
+      _status = LoadStatus.error;
     } on StateError catch (error) {
       if (ticket != _ticket) return;
       _error = error.message;

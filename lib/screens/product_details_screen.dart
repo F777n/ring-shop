@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../core/api_exceptions.dart';
 import '../format.dart';
 import '../models/load_status.dart';
 import '../navigation.dart';
@@ -211,6 +212,12 @@ class ProductDetailsView extends StatelessWidget {
                       label: const Text('Изменить'),
                     ),
                     if (!product.isDeleted)
+                      FilledButton.tonalIcon(
+                        onPressed: () => _sell(context, notifier),
+                        icon: const Icon(Icons.point_of_sale_outlined),
+                        label: const Text('Продать'),
+                      ),
+                    if (!product.isDeleted)
                       OutlinedButton.icon(
                         onPressed: () => _soft(context, notifier),
                         icon: const Icon(Icons.visibility_off_outlined),
@@ -237,6 +244,26 @@ class ProductDetailsView extends StatelessWidget {
             ),
           ),
         );
+    }
+  }
+
+  Future<void> _sell(BuildContext context, ProductDetailsNotifier notifier) async {
+    final product = notifier.product;
+    if (product == null) return;
+    try {
+      await context.read<ProductRepository>().sell(product.id);
+      if (!context.mounted) return;
+      await notifier.load(product.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Товар продан, остаток уменьшен на 1.')),
+      );
+    } on ConflictException catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    } on ApiException catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 

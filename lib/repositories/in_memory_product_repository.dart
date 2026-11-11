@@ -1,3 +1,4 @@
+import '../core/api_exceptions.dart';
 import '../data/seed.dart';
 import '../models/page_result.dart';
 import '../models/product.dart';
@@ -95,7 +96,20 @@ class InMemoryProductRepository implements ProductRepository {
   }
 
   @override
+  Future<Product> sell(int id) async {
+    final current = await findById(id);
+    if (current == null) throw const NotFoundException('Товар не найден.');
+    if (current.stockAvailable <= 0) {
+      throw ConflictException('Нет свободного остатка: «${current.name}» продать нельзя.');
+    }
+    return update(current.copyWith(stockAvailable: current.stockAvailable - 1));
+  }
+
+  @override
   Future<Product> create(Product draft) async {
+    if (await isSkuTaken(draft.sku)) {
+      throw const ValidationException('Ошибка валидации', {'sku': 'Такой артикул уже есть'});
+    }
     final created = Product(
       id: _nextId++,
       name: draft.name,
@@ -116,6 +130,9 @@ class InMemoryProductRepository implements ProductRepository {
 
   @override
   Future<Product> update(Product product) async {
+    if (await isSkuTaken(product.sku, exceptId: product.id)) {
+      throw const ValidationException('Ошибка валидации', {'sku': 'Такой артикул уже есть'});
+    }
     final index = _items.indexWhere((item) => item.id == product.id);
     if (index == -1) throw StateError('Товар ${product.id} не найден');
     _items[index] = product;

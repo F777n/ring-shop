@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../core/api_exceptions.dart';
 import '../widgets/confirm_dialog.dart';
 import 'field_spec.dart';
 import 'form_guard.dart';
@@ -37,6 +38,7 @@ class _EntityFormState extends State<EntityForm> {
   bool _leave = false;
   bool _dirty = false;
   bool _saving = false;
+  final Map<String, String> _serverErrors = {};
 
   @override
   void initState() {
@@ -63,7 +65,16 @@ class _EntityFormState extends State<EntityForm> {
     super.dispose();
   }
 
-  void _onText() => _publishDirty();
+  void _onText() {
+    if (_serverErrors.isNotEmpty) {
+      setState(() {
+        for (final id in _controllers.keys) {
+          _serverErrors.remove(id);
+        }
+      });
+    }
+    _publishDirty();
+  }
 
   Map<String, String> _texts() {
     return {
@@ -115,6 +126,15 @@ class _EntityFormState extends State<EntityForm> {
     setState(() => _saving = true);
     try {
       await widget.onSubmit(_collect());
+    } on ValidationException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _serverErrors
+          ..clear()
+          ..addAll(error.errors);
+        _mode = AutovalidateMode.onUserInteraction;
+      });
+      _formKey.currentState?.validate();
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -238,7 +258,7 @@ class _EntityFormState extends State<EntityForm> {
             ? field.formatters
             : digitFormatters(field.digitsOnly),
         decoration: InputDecoration(labelText: field.label, hintText: field.hint),
-        validator: (value) => field.validator(value, _texts()),
+        validator: (value) => _serverErrors[field.id] ?? field.validator(value, _texts()),
       );
     }
     if (field is IntChoiceSpec) return _intChoice(field);
@@ -274,7 +294,7 @@ class _EntityFormState extends State<EntityForm> {
         widget.onChanged(field.id, value);
         _publishDirtyLater();
       },
-      validator: field.validator,
+      validator: (value) => _serverErrors[field.id] ?? field.validator(value),
     );
   }
 
@@ -294,7 +314,7 @@ class _EntityFormState extends State<EntityForm> {
         widget.onChanged(field.id, value);
         _publishDirtyLater();
       },
-      validator: field.validator,
+      validator: (value) => _serverErrors[field.id] ?? field.validator(value),
     );
   }
 
@@ -302,7 +322,7 @@ class _EntityFormState extends State<EntityForm> {
     return FormField<List<int>>(
       key: ValueKey('${field.id}-${field.values.join(',')}'),
       initialValue: List<int>.of(field.values),
-      validator: field.validator,
+      validator: (value) => _serverErrors[field.id] ?? field.validator(value),
       builder: (state) {
         final selected = state.value ?? const <int>[];
         return InputDecorator(

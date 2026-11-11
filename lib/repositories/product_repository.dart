@@ -17,6 +17,8 @@ abstract interface class ProductRepository {
 
   Future<Product> update(Product product);
 
+  Future<Product> sell(int id);
+
   Future<void> softDelete(int id);
 
   Future<void> hardDelete(int id);

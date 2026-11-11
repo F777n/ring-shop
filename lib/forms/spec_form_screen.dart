@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../core/api_exceptions.dart';
 import '../widgets/status_views.dart';
 import 'entity_form.dart';
 import 'field_spec.dart';
@@ -85,6 +86,8 @@ class _SpecFormScreenState extends State<SpecFormScreen> {
       if (!mounted) return;
       context.read<FormGuard>().allowProgrammaticLeave();
       context.go(widget.locationFor(id));
+    } on ValidationException {
+      rethrow;
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));

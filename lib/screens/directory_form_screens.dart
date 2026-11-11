@@ -35,10 +35,6 @@ class CategoryFormScreen extends StatelessWidget {
   Future<FormBlueprint> _loadCategory(CategoryRepository repository) async {
     final category = id == null ? null : await repository.findById(id!);
     if (id != null && category == null) throw StateError('Категория с номером $id не найдена.');
-    final taken = (await repository.all())
-        .where((item) => item.id != id)
-        .map((item) => item.code)
-        .toList();
     return FormBlueprint(
       title: id == null ? 'Новая категория' : 'Изменение категории',
       submitLabel: id == null ? 'Создать' : 'Сохранить',
@@ -63,8 +59,7 @@ class CategoryFormScreen extends StatelessWidget {
           hint: 'GLV',
           initialValue: textValue(values, 'code'),
           validator: (value, _) =>
-              (requiredText(value, message: 'Укажите код') ?? lengthBetween(value, 2, 12)) ??
-              uniqueValue(value, taken, 'Такой код уже есть'),
+              requiredText(value, message: 'Укажите код') ?? lengthBetween(value, 2, 12),
         ),
         StringChoiceSpec(
           id: 'kind',
@@ -102,9 +97,6 @@ class CategoryFormScreen extends StatelessWidget {
       kind: stringValue(values, 'kind') ?? '',
       introducedYear: int.parse(textValue(values, 'introducedYear')),
     );
-    if (await repository.isCodeTaken(draft.code, exceptId: id)) {
-      throw StateError('Такой код уже есть.');
-    }
     if (id == null) return (await repository.create(draft)).id;
     final current = await repository.findById(id!);
     if (current == null) throw StateError('Категория уже удалена.');
@@ -235,10 +227,6 @@ class CustomerFormScreen extends StatelessWidget {
   Future<FormBlueprint> _load(CustomerRepository repository) async {
     final customer = id == null ? null : await repository.findById(id!);
     if (id != null && customer == null) throw StateError('Клиент с номером $id не найден.');
-    final taken = (await repository.all())
-        .where((item) => item.id != id)
-        .map((item) => item.email)
-        .toList();
     return FormBlueprint(
       title: id == null ? 'Новый клиент' : 'Изменение клиента',
       submitLabel: id == null ? 'Создать' : 'Сохранить',
@@ -266,8 +254,7 @@ class CustomerFormScreen extends StatelessWidget {
           label: 'Почта',
           initialValue: textValue(values, 'email'),
           keyboardType: TextInputType.emailAddress,
-          validator: (value, _) =>
-              emailText(value) ?? uniqueValue(value, taken, 'Такая почта уже есть'),
+          validator: (value, _) => emailText(value),
         ),
         TextFieldSpec(
           id: 'phone',
@@ -333,9 +320,6 @@ class CustomerFormScreen extends StatelessWidget {
 
   Future<int> _save(CustomerRepository repository, Map<String, Object?> values) async {
     final email = textValue(values, 'email');
-    if (await repository.isEmailTaken(email, exceptId: id)) {
-      throw StateError('Такая почта уже есть.');
-    }
     final draft = Customer(
       id: id ?? 0,
       fullName: textValue(values, 'fullName'),

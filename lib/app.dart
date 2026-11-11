@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,7 @@ import 'models/customer_query.dart';
 import 'models/discipline.dart';
 import 'models/discipline_query.dart';
 import 'navigation.dart';
+import 'repositories/api_repositories.dart';
 import 'repositories/brand_repository.dart';
 import 'repositories/directory_repositories.dart';
 import 'repositories/in_memory_brand_repository.dart';
@@ -23,12 +25,17 @@ import 'state/simple_list_notifier.dart';
 import 'storage/catalog_store.dart';
 import 'theme.dart';
 
-Widget buildRingApp({CatalogSession? session}) {
-  final products = session?.products ?? InMemoryProductRepository();
-  final brands = session?.brands ?? InMemoryBrandRepository();
-  final categories = session?.categories ?? InMemoryCategoryRepository();
-  final disciplines = session?.disciplines ?? InMemoryDisciplineRepository();
-  final customers = session?.customers ?? InMemoryCustomerRepository();
+Widget buildRingApp({CatalogSession? session, Dio? dio}) {
+  final products = session?.products ??
+      (dio == null ? InMemoryProductRepository() : ApiProductRepository(dio));
+  final brands =
+      session?.brands ?? (dio == null ? InMemoryBrandRepository() : ApiBrandRepository(dio));
+  final categories = session?.categories ??
+      (dio == null ? InMemoryCategoryRepository() : ApiCategoryRepository(dio));
+  final disciplines = session?.disciplines ??
+      (dio == null ? InMemoryDisciplineRepository() : ApiDisciplineRepository(dio));
+  final customers = session?.customers ??
+      (dio == null ? InMemoryCustomerRepository() : ApiCustomerRepository(dio));
   final notice = session?.notice ?? StorageNotice(null);
   return MultiProvider(
     providers: [

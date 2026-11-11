@@ -1,3 +1,4 @@
+import '../core/api_exceptions.dart';
 import '../data/seed.dart';
 import '../models/category.dart';
 import '../models/category_query.dart';
@@ -119,10 +120,20 @@ class InMemoryCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<Category> create(Category category) => _table.create(category);
+  Future<Category> create(Category category) async {
+    if (await isCodeTaken(category.code)) {
+      throw const ValidationException('Ошибка валидации', {'code': 'Такой код уже есть'});
+    }
+    return _table.create(category);
+  }
 
   @override
-  Future<Category> update(Category category) => _table.update(category, 'Категория ${category.id} не найдена');
+  Future<Category> update(Category category) async {
+    if (await isCodeTaken(category.code, exceptId: category.id)) {
+      throw const ValidationException('Ошибка валидации', {'code': 'Такой код уже есть'});
+    }
+    return _table.update(category, 'Категория ${category.id} не найдена');
+  }
 
   @override
   Future<void> softDelete(int id) {
@@ -320,10 +331,20 @@ class InMemoryCustomerRepository implements CustomerRepository {
   }
 
   @override
-  Future<Customer> create(Customer customer) => _table.create(customer);
+  Future<Customer> create(Customer customer) async {
+    if (await isEmailTaken(customer.email)) {
+      throw const ValidationException('Ошибка валидации', {'email': 'Такая почта уже есть'});
+    }
+    return _table.create(customer);
+  }
 
   @override
-  Future<Customer> update(Customer customer) => _table.update(customer, 'Клиент ${customer.id} не найден');
+  Future<Customer> update(Customer customer) async {
+    if (await isEmailTaken(customer.email, exceptId: customer.id)) {
+      throw const ValidationException('Ошибка валидации', {'email': 'Такая почта уже есть'});
+    }
+    return _table.update(customer, 'Клиент ${customer.id} не найден');
+  }
 
   @override
   Future<void> softDelete(int id) {
