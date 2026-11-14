@@ -121,6 +121,11 @@ class SimpleListNotifier<T, Q> extends ChangeNotifier {
   Future<void> _mutate(Future<void> Function() action) async {
     try {
       await action();
+    } on ApiException catch (error) {
+      _error = error.message;
+      _status = LoadStatus.error;
+      notifyListeners();
+      return;
     } catch (error) {
       _error = 'Не удалось изменить запись: $error';
       _status = LoadStatus.error;

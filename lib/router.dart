@@ -19,23 +19,49 @@ import 'screens/brand_form_screen.dart';
 import 'screens/brand_list_screen.dart';
 import 'screens/directory_form_screens.dart';
 import 'screens/directory_pages.dart';
+import 'screens/admin_screen.dart';
+import 'screens/counter_screen.dart';
+import 'screens/forbidden_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/not_found_screen.dart';
+import 'screens/orders_screen.dart';
 import 'screens/product_details_screen.dart';
 import 'screens/product_form_screen.dart';
 import 'screens/product_list_screen.dart';
+import 'screens/register_screen.dart';
+import 'state/auth_notifier.dart';
 import 'state/simple_list_notifier.dart';
 
-GoRouter createRouter() {
+GoRouter createRouter(AuthNotifier auth) {
   return GoRouter(
     initialLocation: '/products',
+    refreshListenable: auth,
     redirect: (context, state) {
-      if (state.uri.path == '/') return '/products';
+      final path = state.uri.path;
+      final logged = auth.isAuthenticated;
+      final public = path == '/login' || path == '/register';
+      if (!logged && !public) {
+        return '/login?from=${Uri.encodeComponent(state.uri.toString())}';
+      }
+      if (logged && public) {
+        final from = state.uri.queryParameters['from'];
+        if (from != null && _safeReturn(auth, from)) return from;
+        return '/products';
+      }
+      if (logged && path != '/forbidden' && !auth.allowsPath(path)) return '/forbidden';
+      if (path == '/') return '/products';
       return null;
     },
     errorBuilder: (context, state) {
       return NotFoundScreen(location: state.uri.toString());
     },
     routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => LoginScreen(from: state.uri.queryParameters['from']),
+      ),
+      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      GoRoute(path: '/forbidden', builder: (context, state) => const ForbiddenScreen()),
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
@@ -74,10 +100,20 @@ GoRouter createRouter() {
             details: (id) => _customerDetails(id),
             edit: (id) => CustomerFormScreen(id: id),
           ),
+          GoRoute(path: '/orders', builder: (context, state) => const OrdersScreen()),
+          GoRoute(path: '/counter', builder: (context, state) => const CounterScreen()),
+          GoRoute(path: '/admin', builder: (context, state) => const AdminScreen()),
         ],
       ),
     ],
   );
+}
+
+bool _safeReturn(AuthNotifier auth, String from) {
+  if (!from.startsWith('/') || from.startsWith('//')) return false;
+  final uri = Uri.tryParse(from);
+  if (uri == null || uri.hasScheme) return false;
+  return auth.allowsPath(uri.path);
 }
 
 GoRoute _section({

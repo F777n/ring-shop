@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../auth/access.dart';
 import '../format.dart';
 import '../models/load_status.dart';
 import '../models/product_query.dart';
@@ -10,6 +11,7 @@ import '../forms/validators.dart';
 import '../repositories/brand_repository.dart';
 import '../repositories/directory_repositories.dart';
 import '../repositories/product_repository.dart';
+import '../state/auth_notifier.dart';
 import '../state/brand_details_notifier.dart';
 import '../state/brand_list_notifier.dart';
 import '../widgets/catalog_widgets.dart';
@@ -176,11 +178,12 @@ class BrandDetailsView extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                FilledButton.tonalIcon(
-                  onPressed: () => context.go('/brands/${brand.id}/edit'),
-                  icon: const Icon(Icons.edit_outlined),
-                  label: const Text('Изменить'),
-                ),
+                if (context.watch<AuthNotifier>().can(Operation.manageCatalog))
+                  FilledButton.tonalIcon(
+                    onPressed: () => context.go('/brands/${brand.id}/edit'),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('Изменить'),
+                  ),
                 const SizedBox(height: 8),
                 FilledButton.tonalIcon(
                   onPressed: () {
@@ -194,19 +197,20 @@ class BrandDetailsView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (!brand.isDeleted)
+                    if (!brand.isDeleted && context.watch<AuthNotifier>().can(Operation.softDelete))
                       OutlinedButton.icon(
                         onPressed: () => _soft(context, notifier),
                         icon: const Icon(Icons.visibility_off_outlined),
                         label: const Text('Скрыть'),
-                      )
-                    else
+                      ),
+                    if (brand.isDeleted && context.watch<AuthNotifier>().can(Operation.restore))
                       FilledButton.tonalIcon(
                         onPressed: () => _restore(context, notifier),
                         icon: const Icon(Icons.restore),
                         label: const Text('Восстановить'),
                       ),
-                    FilledButton.icon(
+                    if (context.watch<AuthNotifier>().can(Operation.hardDelete))
+                      FilledButton.icon(
                       style: FilledButton.styleFrom(
                         backgroundColor: scheme.error,
                         foregroundColor: scheme.onError,

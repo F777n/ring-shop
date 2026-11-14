@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 
 import '../data/catalog.dart';
 import '../forms/validators.dart';
+import '../auth/access.dart';
 import '../format.dart';
 import '../repositories/product_repository.dart';
 import '../models/brand.dart';
 import '../models/brand_query.dart';
 import '../models/load_status.dart';
 import '../navigation.dart';
+import '../state/auth_notifier.dart';
 import '../state/brand_list_notifier.dart';
 import '../theme.dart';
 import '../widgets/catalog_widgets.dart';
@@ -64,15 +66,18 @@ class _BrandListScreenState extends State<BrandListScreen> {
         title: 'Бренды',
         subtitle: 'Страна и годы основания вместе с поиском остаются в адресе.',
         actions: [
-          FilledButton.icon(
-            onPressed: () => context.go('/brands/new'),
-            icon: const Icon(Icons.add),
-            label: const Text('Добавить'),
-          ),
+          if (context.watch<AuthNotifier>().can(Operation.manageCatalog))
+            FilledButton.icon(
+              onPressed: () => context.go('/brands/new'),
+              icon: const Icon(Icons.add),
+              label: const Text('Добавить'),
+            ),
         ],
       ),
       filters: _filters(query, cards),
-      banner: notifier.hasSelection && notifier.status == LoadStatus.success
+      banner: notifier.hasSelection &&
+              notifier.status == LoadStatus.success &&
+              context.watch<AuthNotifier>().can(Operation.softDelete)
           ? SelectionBar(
               count: notifier.selected.length,
               onClear: notifier.clearSelection,
@@ -249,12 +254,13 @@ class _BrandListScreenState extends State<BrandListScreen> {
             onAction: () => goBrandQuery(context, const BrandQuery()),
           );
         }
+        final canSelect = context.watch<AuthNotifier>().can(Operation.softDelete);
         if (cards) {
           return EntityCardList<Brand>(
             items: notifier.result.items,
             idOf: (item) => item.id,
             selected: notifier.selected,
-            onToggleSelect: notifier.toggleSelection,
+            onToggleSelect: canSelect ? notifier.toggleSelection : null,
             isDimmed: (item) => item.isDeleted,
             actions: _actions,
             body: (context, item) => _card(item),
@@ -264,7 +270,7 @@ class _BrandListScreenState extends State<BrandListScreen> {
           items: notifier.result.items,
           idOf: (item) => item.id,
           selected: notifier.selected,
-          onToggleSelect: notifier.toggleSelection,
+          onToggleSelect: canSelect ? notifier.toggleSelection : null,
           sortField: query.sortField,
           sortAscending: query.sortAscending,
           isDimmed: (item) => item.isDeleted,
@@ -346,6 +352,7 @@ class _BrandListScreenState extends State<BrandListScreen> {
 
   List<Widget> _actions(Brand item) {
     final notifier = context.read<BrandListNotifier>();
+    final auth = context.watch<AuthNotifier>();
     return [
       IconButton(
         visualDensity: VisualDensity.compact,
@@ -353,29 +360,30 @@ class _BrandListScreenState extends State<BrandListScreen> {
         onPressed: () => context.go('/brands/${item.id}'),
         icon: const Icon(Icons.visibility_outlined),
       ),
-      if (!item.isDeleted)
+      if (!item.isDeleted && auth.can(Operation.softDelete))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Скрыть (логическое удаление)',
           onPressed: () => _softOne(item),
           icon: const Icon(Icons.visibility_off_outlined),
-        )
-      else
+        ),
+      if (item.isDeleted && auth.can(Operation.restore))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Восстановить',
           onPressed: () => notifier.restore(item.id),
           icon: const Icon(Icons.restore),
         ),
-      IconButton(
-        visualDensity: VisualDensity.compact,
-        tooltip: 'Удалить навсегда',
-        onPressed: () => _hardOne(item),
-        icon: Icon(
-          Icons.delete_forever_outlined,
-          color: Theme.of(context).colorScheme.error,
+      if (auth.can(Operation.hardDelete))
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          tooltip: 'Удалить навсегда',
+          onPressed: () => _hardOne(item),
+          icon: Icon(
+            Icons.delete_forever_outlined,
+            color: Theme.of(context).colorScheme.error,
+          ),
         ),
-      ),
     ];
   }
 

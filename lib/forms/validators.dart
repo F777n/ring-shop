@@ -34,6 +34,37 @@ String? phoneText(String? value) {
       matches(raw, phonePattern, 'Телефон в формате +7 и 10 цифр');
 }
 
+final digitPattern = RegExp(r'\d');
+final specialPattern = RegExp(r'[^A-Za-zА-Яа-яЁё0-9]');
+
+class PasswordRules {
+  const PasswordRules({required this.length, required this.digit, required this.special});
+
+  final bool length;
+  final bool digit;
+  final bool special;
+
+  bool get ok => length && digit && special;
+
+  static PasswordRules of(String value) {
+    return PasswordRules(
+      length: value.length >= 8,
+      digit: digitPattern.hasMatch(value),
+      special: specialPattern.hasMatch(value),
+    );
+  }
+}
+
+String? passwordText(String? value) {
+  final text = value ?? '';
+  if (text.isEmpty) return 'Укажите пароль';
+  final rules = PasswordRules.of(text);
+  if (!rules.length) return 'Минимум 8 символов';
+  if (!rules.digit) return 'Добавьте цифру';
+  if (!rules.special) return 'Добавьте специальный символ';
+  return null;
+}
+
 String? skuText(String? value) {
   return requiredText(value, message: 'Укажите артикул') ??
       matches(value, skuPattern, '4–32 символа: буквы, цифры и дефис');

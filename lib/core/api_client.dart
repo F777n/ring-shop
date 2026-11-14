@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../state/auth_notifier.dart';
 import 'api_exceptions.dart';
 import 'config.dart';
 
 Dio buildDio({
   String? Function()? tokenProvider,
+  AuthBinder? binder,
   List<Duration> retryDelays = const [
     Duration(milliseconds: 400),
     Duration(milliseconds: 1200),
@@ -60,6 +62,28 @@ Dio buildDio({
           debugPrint('[API] сбой ${error.requestOptions.uri}: ${error.type}');
         }
         final options = error.requestOptions;
+        final path = options.path;
+        final status = error.response?.statusCode;
+        final authCall = path.contains('/auth/');
+        if (binder != null && status == 401 && !authCall) {
+          if (options.extra['authRetried'] == true) {
+            await binder.sessionExpired();
+            return handler.next(error);
+          }
+          final refreshed = await binder.refresh();
+          if (!refreshed) {
+            await binder.sessionExpired();
+            return handler.next(error);
+          }
+          options.extra['authRetried'] = true;
+          options.headers['Authorization'] = 'Bearer ${binder.token ?? ''}';
+          try {
+            final response = await dio.fetch(options);
+            return handler.resolve(response);
+          } on DioException catch (next) {
+            return handler.next(next);
+          }
+        }
         final attempt = options.extra['attempt'] as int? ?? 0;
         final canRetry = options.method.toUpperCase() == 'GET' &&
             _isNetwork(error) &&

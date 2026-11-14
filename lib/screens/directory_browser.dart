@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../auth/access.dart';
 import '../format.dart';
 import '../forms/validators.dart';
 import '../models/load_status.dart';
 import '../navigation.dart';
+import '../state/auth_notifier.dart';
 import '../state/simple_list_notifier.dart';
 import '../theme.dart';
 import '../widgets/catalog_widgets.dart';
@@ -142,15 +144,20 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
         title: widget.title,
         subtitle: widget.subtitle,
         actions: [
-          FilledButton.icon(
-            onPressed: () => context.go('${widget.basePath}/new'),
-            icon: const Icon(Icons.add),
-            label: const Text('Добавить'),
-          ),
+          if (context.watch<AuthNotifier>().can(
+                widget.basePath == '/customers' ? Operation.manageCustomers : Operation.manageCatalog,
+              ))
+            FilledButton.icon(
+              onPressed: () => context.go('${widget.basePath}/new'),
+              icon: const Icon(Icons.add),
+              label: const Text('Добавить'),
+            ),
         ],
       ),
       filters: _filterBar(context, query, notifier),
-      banner: notifier.hasSelection && notifier.status == LoadStatus.success
+      banner: notifier.hasSelection &&
+              notifier.status == LoadStatus.success &&
+              context.watch<AuthNotifier>().can(Operation.softDelete)
           ? SelectionBar(
               count: notifier.selected.length,
               onClear: notifier.clearSelection,
@@ -272,12 +279,13 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
             onAction: () => _go(widget.emptyQuery),
           );
         }
+        final canSelect = context.watch<AuthNotifier>().can(Operation.softDelete);
         if (cards) {
           return EntityCardList<T>(
             items: notifier.result.items,
             idOf: widget.idOf,
             selected: notifier.selected,
-            onToggleSelect: notifier.toggleSelection,
+            onToggleSelect: canSelect ? notifier.toggleSelection : null,
             isDimmed: widget.isDeleted,
             actions: (item) => _actions(item, notifier),
             body: (context, item) => _card(item),
@@ -287,7 +295,7 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
           items: notifier.result.items,
           idOf: widget.idOf,
           selected: notifier.selected,
-          onToggleSelect: notifier.toggleSelection,
+          onToggleSelect: canSelect ? notifier.toggleSelection : null,
           sortField: widget.sortFieldOf(query),
           sortAscending: widget.sortAscendingOf(query),
           isDimmed: widget.isDeleted,
@@ -337,32 +345,36 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
         onPressed: () => context.go('${widget.basePath}/$id'),
         icon: const Icon(Icons.open_in_new),
       ),
-      IconButton(
-        visualDensity: VisualDensity.compact,
-        tooltip: 'Изменить',
-        onPressed: () => context.go('${widget.basePath}/$id/edit'),
-        icon: const Icon(Icons.edit_outlined),
-      ),
-      if (!widget.isDeleted(item))
+      if (context.watch<AuthNotifier>().can(
+            widget.basePath == '/customers' ? Operation.manageCustomers : Operation.manageCatalog,
+          ))
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          tooltip: 'Изменить',
+          onPressed: () => context.go('${widget.basePath}/$id/edit'),
+          icon: const Icon(Icons.edit_outlined),
+        ),
+      if (!widget.isDeleted(item) && context.watch<AuthNotifier>().can(Operation.softDelete))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Скрыть',
           onPressed: () => _softOne(item),
           icon: const Icon(Icons.visibility_off_outlined),
-        )
-      else
+        ),
+      if (widget.isDeleted(item) && context.watch<AuthNotifier>().can(Operation.restore))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Восстановить',
           onPressed: () => notifier.restore(id),
           icon: const Icon(Icons.restore),
         ),
-      IconButton(
-        visualDensity: VisualDensity.compact,
-        tooltip: 'Удалить навсегда',
-        onPressed: () => _hardOne(item),
-        icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
-      ),
+      if (context.watch<AuthNotifier>().can(Operation.hardDelete))
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          tooltip: 'Удалить навсегда',
+          onPressed: () => _hardOne(item),
+          icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+        ),
     ];
   }
 

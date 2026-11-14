@@ -1,8 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const port = Number(readArg('--port') || 8080);
+const accessTtl = Math.max(30, Number(readArg('--ttl') || 900));
+const sessionTtl = Math.max(120, Number(readArg('--session') || 8 * 60 * 60));
+const tokenSecret = 'ring-shop-practice';
 const allowedOrigins = new Set([
   'http://localhost:5555',
   'http://127.0.0.1:5555',
@@ -196,6 +200,252 @@ function nextId(rows) {
   return rows.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
 }
 
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(`ring:${password}`).digest('hex');
+}
+
+function passwordProblems(password) {
+  const text = String(password || '');
+  if (text.length < 8) return 'Минимум 8 символов';
+  if (!/\d/.test(text)) return 'Добавьте цифру';
+  if (!/[^A-Za-zА-Яа-яЁё0-9]/.test(text)) return 'Добавьте специальный символ';
+  return null;
+}
+
+const accounts = [
+  { id: 1, username: 'buyer', passwordHash: hashPassword('Buyer123!'), fullName: 'Иванов Пётр', role: 'buyer' },
+  { id: 2, username: 'seller', passwordHash: hashPassword('Seller123!'), fullName: 'Петрова Анна', role: 'seller' },
+  { id: 3, username: 'admin', passwordHash: hashPassword('Admin123!'), fullName: 'Сидоров Игорь', role: 'admin' },
+];
+
+const reservations = [
+  {
+    id: 1,
+    userId: 1,
+    productName: 'Перчатки Winning MS-600',
+    dueAt: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+    status: 'open',
+  },
+];
+const sales = [];
+
+function sign(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig = crypto.createHmac('sha256', tokenSecret).update(body).digest('base64url');
+  return `${body}.${sig}`;
+}
+
+function verify(token) {
+  if (!token || !token.includes('.')) return null;
+  const [body, sig] = token.split('.');
+  const expected = crypto.createHmac('sha256', tokenSecret).update(body).digest('base64url');
+  const left = Buffer.from(sig);
+  const right = Buffer.from(expected);
+  if (left.length !== right.length || !crypto.timingSafeEqual(left, right)) return null;
+  try {
+    return JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+  } catch (error) {
+    return null;
+  }
+}
+
+function publicUser(user) {
+  return { id: user.id, username: user.username, fullName: user.fullName, role: user.role };
+}
+
+function issueTokens(user, sessionExp) {
+  const now = Math.floor(Date.now() / 1000);
+  const session = sessionExp || now + sessionTtl;
+  return {
+    accessToken: sign({
+      sub: user.id,
+      username: user.username,
+      role: user.role,
+      type: 'access',
+      exp: now + accessTtl,
+      sessionExp: session,
+    }),
+    refreshToken: sign({
+      sub: user.id,
+      username: user.username,
+      role: user.role,
+      type: 'refresh',
+      exp: now + 7 * 24 * 3600,
+      sessionExp: session,
+    }),
+    sessionExpiresAt: new Date(session * 1000).toISOString(),
+    user: publicUser(user),
+  };
+}
+
+function readActor(req) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  const payload = verify(token);
+  const now = Math.floor(Date.now() / 1000);
+  if (!payload || payload.type !== 'access' || payload.exp < now || payload.sessionExp < now) return null;
+  return payload;
+}
+
+function permit(actor, method, name, parts, query) {
+  if (name === 'customers' && actor.role === 'buyer') return false;
+  if (method === 'GET') return true;
+  if (name === 'products' && parts[3] === 'sell') return actor.role === 'seller';
+  const hard = method === 'DELETE' && query.hard === 'true';
+  const restore = method === 'POST' && parts[3] === 'restore';
+  if (hard || restore) return actor.role === 'admin';
+  return actor.role === 'seller' || actor.role === 'admin';
+}
+
+async function handleAuth(req, res, parts, origin) {
+  const action = parts[2];
+  if (req.method === 'GET' && action === 'me') {
+    const actor = readActor(req);
+    if (!actor) return send(res, 401, { message: 'Требуется вход в систему.' }, origin);
+    const user = accounts.find((item) => item.id === actor.sub);
+    if (!user) return send(res, 401, { message: 'Требуется вход в систему.' }, origin);
+    return send(res, 200, publicUser(user), origin);
+  }
+  if (req.method === 'POST' && action === 'logout') {
+    return send(res, 204, null, origin);
+  }
+  const body = req.method === 'POST' ? await readBody(req) : {};
+  if (req.method === 'POST' && action === 'login') {
+    const username = String(body.username || '').trim();
+    const user = accounts.find((item) => item.username === username);
+    if (!user || user.passwordHash !== hashPassword(body.password || '')) {
+      return send(res, 401, { message: 'Неверный логин или пароль' }, origin);
+    }
+    return send(res, 200, issueTokens(user), origin);
+  }
+  if (req.method === 'POST' && action === 'register') {
+    const username = String(body.username || '').trim();
+    const fullName = String(body.fullName || '').trim();
+    const problem = passwordProblems(body.password);
+    const errors = {};
+    if (username.length < 3) errors.username = 'Логин от 3 символов';
+    if (fullName.length < 2) errors.fullName = 'Укажите имя';
+    if (problem) errors.password = problem;
+    if (accounts.some((item) => item.username === username)) errors.username = 'Такой логин уже есть';
+    if (Object.keys(errors).length) {
+      return send(res, 422, { message: 'Ошибка валидации', errors }, origin);
+    }
+    const user = {
+      id: nextId(accounts),
+      username,
+      passwordHash: hashPassword(body.password),
+      fullName,
+      role: 'buyer',
+    };
+    accounts.push(user);
+    return send(res, 201, issueTokens(user), origin);
+  }
+  if (req.method === 'POST' && action === 'refresh') {
+    const payload = verify(body.refreshToken);
+    const now = Math.floor(Date.now() / 1000);
+    if (!payload || payload.type !== 'refresh' || payload.exp < now || payload.sessionExp < now) {
+      return send(res, 401, { message: 'Сессия истекла. Войдите снова.' }, origin);
+    }
+    const user = accounts.find((item) => item.id === payload.sub);
+    if (!user) return send(res, 401, { message: 'Сессия истекла. Войдите снова.' }, origin);
+    return send(res, 200, issueTokens(user, payload.sessionExp), origin);
+  }
+  return send(res, 404, { message: 'Адрес не найден' }, origin);
+}
+
+async function handleOrders(req, res, parts, origin, actor) {
+  if (actor.role !== 'buyer') {
+    return send(res, 403, { message: 'Недостаточно прав для этого действия.' }, origin);
+  }
+  if (req.method === 'GET' && parts.length === 2) {
+    const items = reservations.filter((item) => item.userId === actor.sub);
+    return send(res, 200, { items }, origin);
+  }
+  if (req.method === 'POST' && parts[3] === 'extend') {
+    const order = reservations.find((item) => item.id === Number(parts[2]) && item.userId === actor.sub);
+    if (!order) return send(res, 404, { message: 'Бронь не найдена' }, origin);
+    order.dueAt = new Date(new Date(order.dueAt).getTime() + 7 * 24 * 3600 * 1000).toISOString();
+    return send(res, 200, order, origin);
+  }
+  return send(res, 404, { message: 'Адрес не найден' }, origin);
+}
+
+async function handleSales(req, res, parts, origin, actor) {
+  if (actor.role !== 'seller') {
+    return send(res, 403, { message: 'Недостаточно прав для этого действия.' }, origin);
+  }
+  if (req.method === 'GET' && parts.length === 2) return send(res, 200, { items: sales }, origin);
+  if (req.method === 'POST' && parts.length === 2) {
+    const body = await readBody(req);
+    const product = db.products.find((item) => item.id === Number(body.productId));
+    const customer = db.customers.find((item) => item.id === Number(body.customerId));
+    if (!product || !customer) return send(res, 404, { message: 'Товар или клиент не найден' }, origin);
+    if ((product.stockAvailable || 0) <= 0) {
+      return send(res, 409, { message: `Нет свободного остатка: «${product.name}» продать нельзя.` }, origin);
+    }
+    product.stockAvailable -= 1;
+    const sale = {
+      id: nextId(sales),
+      productId: product.id,
+      productName: product.name,
+      customerId: customer.id,
+      customerName: customer.fullName,
+      status: 'open',
+    };
+    sales.push(sale);
+    return send(res, 201, sale, origin);
+  }
+  if (req.method === 'POST' && parts[3] === 'close') {
+    const sale = sales.find((item) => item.id === Number(parts[2]));
+    if (!sale) return send(res, 404, { message: 'Продажа не найдена' }, origin);
+    sale.status = 'closed';
+    return send(res, 200, sale, origin);
+  }
+  return send(res, 404, { message: 'Адрес не найден' }, origin);
+}
+
+async function handleUsers(req, res, parts, origin, actor) {
+  if (actor.role !== 'admin') {
+    return send(res, 403, { message: 'Недостаточно прав для этого действия.' }, origin);
+  }
+  if (req.method === 'GET' && parts.length === 2) {
+    return send(res, 200, { items: accounts.map(publicUser) }, origin);
+  }
+  if (req.method === 'PUT' && parts.length === 3) {
+    const user = accounts.find((item) => item.id === Number(parts[2]));
+    if (!user) return send(res, 404, { message: 'Пользователь не найден' }, origin);
+    const body = await readBody(req);
+    if (!['buyer', 'seller', 'admin'].includes(body.role)) {
+      return send(res, 422, { message: 'Ошибка валидации', errors: { role: 'Неизвестная роль' } }, origin);
+    }
+    if (user.id === actor.sub) {
+      return send(res, 409, { message: 'Свою роль менять нельзя.' }, origin);
+    }
+    user.role = body.role;
+    return send(res, 200, publicUser(user), origin);
+  }
+  return send(res, 404, { message: 'Адрес не найден' }, origin);
+}
+
+function handleStats(req, res, origin, actor) {
+  if (actor.role !== 'admin') {
+    return send(res, 403, { message: 'Недостаточно прав для этого действия.' }, origin);
+  }
+  const alive = (rows) => rows.filter((item) => !item.deletedAt).length;
+  return send(
+    res,
+    200,
+    {
+      products: alive(db.products),
+      brands: alive(db.brands),
+      customers: alive(db.customers),
+      users: accounts.length,
+      openSales: sales.filter((item) => item.status === 'open').length,
+    },
+    origin,
+  );
+}
+
 const server = http.createServer(async (req, res) => {
   const origin = req.headers.origin;
   if (req.method === 'OPTIONS') {
@@ -212,13 +462,22 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/api/__health') return send(res, 200, { ok: true }, origin);
 
   const parts = url.pathname.split('/').filter(Boolean);
-  if (parts[0] !== 'api' || !resources[parts[1]]) {
-    return send(res, 404, { message: 'Адрес не найден' }, origin);
+  const query = Object.fromEntries(url.searchParams.entries());
+  if (parts[0] !== 'api') return send(res, 404, { message: 'Адрес не найден' }, origin);
+  if (parts[1] === 'auth') return handleAuth(req, res, parts, origin);
+  const actor = readActor(req);
+  if (!actor) return send(res, 401, { message: 'Требуется вход в систему.' }, origin);
+  if (parts[1] === 'orders') return handleOrders(req, res, parts, origin, actor);
+  if (parts[1] === 'sales') return handleSales(req, res, parts, origin, actor);
+  if (parts[1] === 'users') return handleUsers(req, res, parts, origin, actor);
+  if (parts[1] === 'stats') return handleStats(req, res, origin, actor);
+  if (!resources[parts[1]]) return send(res, 404, { message: 'Адрес не найден' }, origin);
+  if (!permit(actor, req.method, parts[1], parts, query)) {
+    return send(res, 403, { message: 'Недостаточно прав для этого действия.' }, origin);
   }
   const name = parts[1];
   const resource = resources[name];
   const rows = resource.rows();
-  const query = Object.fromEntries(url.searchParams.entries());
 
   try {
     if (req.method === 'GET' && parts.length === 2) {

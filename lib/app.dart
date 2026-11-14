@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'auth/auth_api.dart';
 import 'forms/form_guard.dart';
 import 'models/category.dart';
 import 'models/category_query.dart';
@@ -19,13 +20,14 @@ import 'repositories/in_memory_brand_repository.dart';
 import 'repositories/in_memory_product_repository.dart';
 import 'repositories/product_repository.dart';
 import 'router.dart';
+import 'state/auth_notifier.dart';
 import 'state/brand_list_notifier.dart';
 import 'state/product_list_notifier.dart';
 import 'state/simple_list_notifier.dart';
 import 'storage/catalog_store.dart';
 import 'theme.dart';
 
-Widget buildRingApp({CatalogSession? session, Dio? dio}) {
+Widget buildRingApp({CatalogSession? session, Dio? dio, AuthNotifier? auth}) {
   final products = session?.products ??
       (dio == null ? InMemoryProductRepository() : ApiProductRepository(dio));
   final brands =
@@ -37,8 +39,11 @@ Widget buildRingApp({CatalogSession? session, Dio? dio}) {
   final customers = session?.customers ??
       (dio == null ? InMemoryCustomerRepository() : ApiCustomerRepository(dio));
   final notice = session?.notice ?? StorageNotice(null);
+  final sessionAuth = auth ?? AuthNotifier.preview();
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider<AuthNotifier>.value(value: sessionAuth),
+      if (dio != null) Provider(create: (_) => DeskApi(dio)),
       ChangeNotifierProvider(create: (_) => ThemeController()),
       ChangeNotifierProvider(create: (_) => FormGuard()),
       ChangeNotifierProvider<StorageNotice>.value(value: notice),
@@ -92,7 +97,7 @@ Widget buildRingApp({CatalogSession? session, Dio? dio}) {
         ),
       ),
     ],
-    child: RingApp(router: createRouter()),
+    child: RingApp(router: createRouter(sessionAuth)),
   );
 }
 

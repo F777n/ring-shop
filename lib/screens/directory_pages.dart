@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../auth/access.dart';
 import '../format.dart';
+import '../state/auth_notifier.dart';
 import '../models/category.dart';
 import '../models/category_query.dart';
 import '../models/customer.dart';
@@ -473,18 +475,20 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                FilledButton.tonalIcon(
-                  onPressed: () => context.go(widget.editPath),
-                  icon: const Icon(Icons.edit_outlined),
-                  label: const Text('Изменить'),
-                ),
-                if (!record.deleted)
+                if (context.watch<AuthNotifier>().can(Operation.manageCatalog) ||
+                    context.watch<AuthNotifier>().can(Operation.manageCustomers))
+                  FilledButton.tonalIcon(
+                    onPressed: () => context.go(widget.editPath),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('Изменить'),
+                  ),
+                if (!record.deleted && context.watch<AuthNotifier>().can(Operation.softDelete))
                   OutlinedButton.icon(
                     onPressed: () => _mutate(soft: true, name: record.title),
                     icon: const Icon(Icons.visibility_off_outlined),
                     label: const Text('Скрыть'),
-                  )
-                else
+                  ),
+                if (record.deleted && context.watch<AuthNotifier>().can(Operation.restore))
                   FilledButton.tonalIcon(
                     onPressed: () async {
                       await widget.onRestore(widget.id);
@@ -496,7 +500,8 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
                     icon: const Icon(Icons.restore),
                     label: const Text('Восстановить'),
                   ),
-                FilledButton.icon(
+                if (context.watch<AuthNotifier>().can(Operation.hardDelete))
+                  FilledButton.icon(
                   style: FilledButton.styleFrom(
                     backgroundColor: scheme.error,
                     foregroundColor: scheme.onError,

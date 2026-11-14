@@ -116,6 +116,11 @@ class BrandListNotifier extends ChangeNotifier {
   ) async {
     try {
       await action();
+    } on ApiException catch (error) {
+      _error = error.message;
+      _status = LoadStatus.error;
+      notifyListeners();
+      return;
     } catch (error) {
       _error = '$failMessage $error';
       _status = LoadStatus.error;
