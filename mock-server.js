@@ -3,7 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const port = Number(readArg('--port') || 8080);
+const port = Number(readArg('--port') || process.env.PORT || 8080);
+const host = readArg('--host') || '0.0.0.0';
 const staticRootArg = readArg('--static');
 const accessTtl = Math.max(30, Number(readArg('--ttl') || 900));
 const sessionTtl = Math.max(120, Number(readArg('--session') || 8 * 60 * 60));
@@ -624,7 +625,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(port, '127.0.0.1', () => {
+server.listen(port, host, () => {
   console.log(`Учебный API: http://127.0.0.1:${port}/api/__health`);
   if (staticRootArg) {
     console.log(`Магазин и API: http://127.0.0.1:${port}/`);

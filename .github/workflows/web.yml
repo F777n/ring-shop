@@ -30,7 +30,7 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: |
-          if [ -z "$API_BASE_URL" ]; then API_BASE_URL="https://6c68110fa8653edb-203-23-179-122.serveousercontent.com/api"; fi
+          if [ -z "$API_BASE_URL" ]; then API_BASE_URL="https://dfe6a93ffa6ad8cd-203-23-179-122.serveousercontent.com/api"; fi
           flutter build web --release \
             --base-href /${{ github.event.repository.name }}/ \
             --dart-define=API_BASE_URL="$API_BASE_URL"

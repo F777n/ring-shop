@@ -1,0 +1,10 @@
+{
+  "name": "ring-shop-api",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "start": "node mock-server.js"
+  }
+}

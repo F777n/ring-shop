@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ring-shop-f777n
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: master
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/__health
