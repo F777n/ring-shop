@@ -41,7 +41,7 @@ function send(res, status, body, origin) {
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Pinggy-No-Screen',
   };
   if (originAllowed(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;

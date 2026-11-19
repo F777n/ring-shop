@@ -18,7 +18,11 @@ Dio buildDio({
       baseUrl: apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        // Pinggy's free tunnel shows a browser warning unless this header is set.
+        'X-Pinggy-No-Screen': '1',
+      },
       validateStatus: (status) => status != null && status < 500,
     ),
   );
