@@ -31,6 +31,20 @@ const db = {
   categories: catalog.categories,
   disciplines: catalog.disciplines,
   customers: catalog.customers,
+  coaches: [
+    { id: 1, name: 'Игорь Волков', rank: 'МС', phone: '+79002000001', disciplineIds: [1, 11] },
+    { id: 2, name: 'Анна Ким', rank: 'КМС', phone: '+79002000002', disciplineIds: [1, 2] },
+    { id: 3, name: 'Сергей Дроздов', rank: 'МСМК', phone: '+79002000003', disciplineIds: [2, 9] },
+  ],
+  halls: [
+    { id: 1, name: 'Ринг А', address: 'Москва, ул. Боксёрская, 4', capacity: 2 },
+    { id: 2, name: 'Ринг Б', address: 'Москва, ул. Боксёрская, 4', capacity: 4 },
+  ],
+  trainings: [
+    { id: 1, title: 'Спарринг вечером', hallId: 1, coachId: 1, disciplineId: 1, startsAt: '2026-11-20T15:00:00.000Z', endsAt: '2026-11-20T16:30:00.000Z', priceRub: 3000, customerId: 1 },
+    { id: 2, title: 'Работа на мешке', hallId: 1, coachId: 2, disciplineId: 1, startsAt: '2026-11-20T17:00:00.000Z', endsAt: '2026-11-20T18:00:00.000Z', priceRub: 2500, customerId: null },
+    { id: 3, title: 'Утренняя техника', hallId: 2, coachId: 3, disciplineId: 2, startsAt: '2026-11-21T07:00:00.000Z', endsAt: '2026-11-21T08:30:00.000Z', priceRub: 4000, customerId: 2 },
+  ],
 };
 
 function readArg(name) {
@@ -204,7 +218,40 @@ const resources = {
       return null;
     },
   },
+  coaches: {
+    rows: () => db.coaches,
+    search: (item) => `${item.name} ${item.rank} ${item.phone}`,
+    year: () => 0,
+  },
+  halls: {
+    rows: () => db.halls,
+    search: (item) => `${item.name} ${item.address}`,
+    year: () => 0,
+  },
+  trainings: {
+    rows: () => db.trainings,
+    search: (item) => item.title,
+    year: () => 0,
+    validate(body, exceptId) {
+      return trainingConflict(body, exceptId);
+    },
+  },
 };
+
+function trainingConflict(body, exceptId) {
+  const start = Date.parse(body.startsAt);
+  const end = Date.parse(body.endsAt);
+  if (!start || !end || end <= start) return { endsAt: 'Конец должен быть позже начала' };
+  const hallId = Number(body.hallId);
+  const clash = db.trainings.find((item) => {
+    if (item.deletedAt || item.id === exceptId || Number(item.hallId) !== hallId) return false;
+    const left = Date.parse(item.startsAt);
+    const right = Date.parse(item.endsAt);
+    return start < right && left < end;
+  });
+  if (clash) return { __conflict: `Зал занят: «${clash.title}» уже стоит на это время.` };
+  return null;
+}
 
 function nextId(rows) {
   return rows.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
@@ -568,6 +615,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && parts.length === 2) {
       const body = await readBody(req);
       const errors = resource.validate ? resource.validate(body) : null;
+      if (errors && errors.__conflict) return send(res, 409, { message: errors.__conflict }, origin);
       if (errors) return send(res, 422, { message: 'Ошибка валидации', errors }, origin);
       const created = { ...body, id: nextId(rows), deletedAt: null };
       rows.push(created);
@@ -583,6 +631,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'PUT' && parts.length === 3) {
       const body = await readBody(req);
       const errors = resource.validate ? resource.validate(body, id) : null;
+      if (errors && errors.__conflict) return send(res, 409, { message: errors.__conflict }, origin);
       if (errors) return send(res, 422, { message: 'Ошибка валидации', errors }, origin);
       Object.assign(item, body, { id, deletedAt: item.deletedAt || null });
       return send(res, 200, item, origin);

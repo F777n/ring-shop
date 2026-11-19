@@ -29,6 +29,7 @@ enum Operation {
   restore,
   manageUsers,
   viewStats,
+  manageSchedule,
 }
 
 bool can(Role role, Operation operation) {
@@ -40,6 +41,7 @@ bool can(Role role, Operation operation) {
     Operation.sell => role == Role.seller,
     Operation.manageCustomers => role == Role.seller || role == Role.admin,
     Operation.viewOrders || Operation.extendOrder => role == Role.buyer,
+    Operation.manageSchedule => role == Role.seller || role == Role.admin,
     Operation.hardDelete ||
     Operation.restore ||
     Operation.manageUsers ||

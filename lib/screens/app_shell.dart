@@ -230,6 +230,8 @@ class _Section {
   final IconData selected;
 }
 
+const _trainings = _Section('/trainings', 'Тренировки', 'Зал',
+    Icons.event_note_outlined, Icons.event_note);
 const _products = _Section('/products', 'Товары', 'Товары',
     Icons.inventory_2_outlined, Icons.inventory_2);
 const _brands = _Section('/brands', 'Бренды', 'Бренды',
@@ -255,6 +257,7 @@ const _admin = _Section('/admin', 'Админ', 'Админ',
 List<_Section> _sectionsFor(Role role) {
   return [
     _products,
+    _trainings,
     if (can(role, Operation.manageCatalog)) ...[
       _brands,
       _categories,

@@ -30,6 +30,8 @@ import 'screens/product_details_screen.dart';
 import 'screens/product_form_screen.dart';
 import 'screens/product_list_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/schedule_screens.dart';
+import 'models/schedule_query.dart';
 import 'state/auth_notifier.dart';
 import 'state/simple_list_notifier.dart';
 
@@ -112,6 +114,30 @@ GoRouter createRouter(AuthNotifier auth) {
             create: const CustomerFormScreen(),
             details: (id) => _customerDetails(id),
             edit: (id) => CustomerFormScreen(id: id),
+          ),
+          _section(
+            path: '/trainings',
+            list: (state) =>
+                TrainingListScreen(query: ScheduleQuery.fromUri(state.uri)),
+            create: const TrainingFormScreen(),
+            details: (id) => TrainingFormScreen(id: id),
+            edit: (id) => TrainingFormScreen(id: id),
+          ),
+          _section(
+            path: '/coaches',
+            list: (state) =>
+                CoachListScreen(query: ScheduleQuery.fromUri(state.uri)),
+            create: const CoachFormScreen(),
+            details: (id) => CoachFormScreen(id: id),
+            edit: (id) => CoachFormScreen(id: id),
+          ),
+          _section(
+            path: '/halls',
+            list: (state) =>
+                HallListScreen(query: ScheduleQuery.fromUri(state.uri)),
+            create: const HallFormScreen(),
+            details: (id) => HallFormScreen(id: id),
+            edit: (id) => HallFormScreen(id: id),
           ),
           GoRoute(
             path: '/orders',

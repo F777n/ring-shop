@@ -19,6 +19,7 @@ import 'repositories/directory_repositories.dart';
 import 'repositories/in_memory_brand_repository.dart';
 import 'repositories/in_memory_product_repository.dart';
 import 'repositories/product_repository.dart';
+import 'repositories/schedule_repository.dart';
 import 'router.dart';
 import 'state/auth_notifier.dart';
 import 'state/brand_list_notifier.dart';
@@ -40,6 +41,12 @@ Widget buildRingApp({CatalogSession? session, Dio? dio, AuthNotifier? auth}) {
           : ApiDisciplineRepository(dio));
   final customers = session?.customers ??
       (dio == null ? InMemoryCustomerRepository() : ApiCustomerRepository(dio));
+  final coaches =
+      dio == null ? InMemoryCoachRepository() : ApiCoachRepository(dio);
+  final halls = dio == null ? InMemoryHallRepository() : ApiHallRepository(dio);
+  final trainings = dio == null
+      ? InMemoryTrainingRepository()
+      : ApiTrainingRepository(dio);
   final notice = session?.notice ?? StorageNotice(null);
   final sessionAuth = auth ?? AuthNotifier.preview();
   return MultiProvider(
@@ -55,6 +62,9 @@ Widget buildRingApp({CatalogSession? session, Dio? dio, AuthNotifier? auth}) {
       Provider<CategoryRepository>.value(value: categories),
       Provider<DisciplineRepository>.value(value: disciplines),
       Provider<CustomerRepository>.value(value: customers),
+      Provider<CoachRepository>.value(value: coaches),
+      Provider<HallRepository>.value(value: halls),
+      Provider<TrainingRepository>.value(value: trainings),
       ChangeNotifierProvider(
         create: (context) => ProductListNotifier(
           context.read<ProductRepository>(),

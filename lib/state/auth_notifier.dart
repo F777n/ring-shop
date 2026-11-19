@@ -89,6 +89,16 @@ class AuthNotifier extends ChangeNotifier {
         path.startsWith('/disciplines')) {
       return canDo(current.role, Operation.manageCatalog);
     }
+    if (path.startsWith('/trainings')) {
+      final editing = path.endsWith('/new') || path.endsWith('/edit');
+      return canDo(
+        current.role,
+        editing ? Operation.manageCatalog : Operation.viewCatalog,
+      );
+    }
+    if (path.startsWith('/coaches') || path.startsWith('/halls')) {
+      return canDo(current.role, Operation.manageCatalog);
+    }
     if (path.startsWith('/products')) {
       final editing = path.endsWith('/new') || path.endsWith('/edit');
       return canDo(current.role,
