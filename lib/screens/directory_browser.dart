@@ -81,7 +81,9 @@ class DirectoryBrowser<T, Q> extends StatefulWidget {
   final String Function(T item) nameOf;
   final bool Function(T item) isDeleted;
   final DateTime? Function(T item) deletedAt;
-  final List<Widget> Function(BuildContext context, Q query, bool narrow, void Function(Q next) go) filters;
+  final List<Widget> Function(
+          BuildContext context, Q query, bool narrow, void Function(Q next) go)
+      filters;
   final List<(String, bool, String)> sortOptions;
   final String Function(Q query) sortCaption;
   final Future<int> Function(int id) linksOf;
@@ -103,7 +105,8 @@ class DirectoryBrowser<T, Q> extends StatefulWidget {
 class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
   Q? _synced;
 
-  SimpleListNotifier<T, Q> get _notifier => context.read<SimpleListNotifier<T, Q>>();
+  SimpleListNotifier<T, Q> get _notifier =>
+      context.read<SimpleListNotifier<T, Q>>();
 
   @override
   void didChangeDependencies() {
@@ -145,7 +148,9 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
         subtitle: widget.subtitle,
         actions: [
           if (context.watch<AuthNotifier>().can(
-                widget.basePath == '/customers' ? Operation.manageCustomers : Operation.manageCatalog,
+                widget.basePath == '/customers'
+                    ? Operation.manageCustomers
+                    : Operation.manageCatalog,
               ))
             FilledButton.icon(
               onPressed: () => context.go('${widget.basePath}/new'),
@@ -178,7 +183,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
     );
   }
 
-  Widget _filterBar(BuildContext context, Q query, SimpleListNotifier<T, Q> notifier) {
+  Widget _filterBar(
+      BuildContext context, Q query, SimpleListNotifier<T, Q> notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -198,7 +204,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
                     label: 'Поиск',
                     hint: widget.searchHint,
                     prefixIcon: Icons.search,
-                    onDebounced: (value) => _go(widget.withSearch(query, value)),
+                    onDebounced: (value) =>
+                        _go(widget.withSearch(query, value)),
                   ),
                 ),
                 ...widget.filters(context, query, narrow, _go),
@@ -208,7 +215,9 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
                   onSelected: (value) => _go(widget.withDeleted(query, value)),
                 ),
                 TextButton.icon(
-                  onPressed: query == widget.emptyQuery ? null : () => _go(widget.emptyQuery),
+                  onPressed: query == widget.emptyQuery
+                      ? null
+                      : () => _go(widget.emptyQuery),
                   icon: const Icon(Icons.filter_alt_off),
                   label: const Text('Сбросить'),
                 ),
@@ -223,7 +232,9 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
                     if (value == 'error') notifier.demonstrateError();
                   },
                   itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'error', child: Text('Показать состояние ошибки')),
+                    PopupMenuItem(
+                        value: 'error',
+                        child: Text('Показать состояние ошибки')),
                   ],
                 ),
               ],
@@ -238,7 +249,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
               width: 280,
               child: FilterDropdown<String>(
                 label: 'Сортировка',
-                value: '${widget.sortFieldOf(query)}|${widget.sortAscendingOf(query)}',
+                value:
+                    '${widget.sortFieldOf(query)}|${widget.sortAscendingOf(query)}',
                 items: [
                   for (final option in widget.sortOptions)
                     DropdownMenuItem(
@@ -249,7 +261,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
                 onChanged: (value) {
                   if (value == null) return;
                   final parts = value.split('|');
-                  _go(widget.withSort(query, parts.first, parts.last == 'true'));
+                  _go(widget.withSort(
+                      query, parts.first, parts.last == 'true'));
                 },
               ),
             ),
@@ -269,7 +282,9 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
       case LoadStatus.loading:
         return LoadingView(message: 'Загружаем ${widget.title.toLowerCase()}…');
       case LoadStatus.error:
-        return ErrorView(message: notifier.error ?? 'Неизвестная ошибка', onRetry: notifier.load);
+        return ErrorView(
+            message: notifier.error ?? 'Неизвестная ошибка',
+            onRetry: notifier.load);
       case LoadStatus.success:
         if (notifier.result.items.isEmpty) {
           return EmptyView(
@@ -279,7 +294,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
             onAction: () => _go(widget.emptyQuery),
           );
         }
-        final canSelect = context.watch<AuthNotifier>().can(Operation.softDelete);
+        final canSelect =
+            context.watch<AuthNotifier>().can(Operation.softDelete);
         if (cards) {
           return EntityCardList<T>(
             items: notifier.result.items,
@@ -301,7 +317,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
           isDimmed: widget.isDeleted,
           onSort: (field) {
             final same = field == widget.sortFieldOf(query);
-            _go(widget.withSort(query, field, same ? !widget.sortAscendingOf(query) : true));
+            _go(widget.withSort(
+                query, field, same ? !widget.sortAscendingOf(query) : true));
           },
           columns: [
             for (final column in widget.columns)
@@ -311,7 +328,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
                 numeric: column.numeric,
                 build: (item) => column.width == null
                     ? Text(column.text(item))
-                    : SizedBox(width: column.width, child: Text(column.text(item))),
+                    : SizedBox(
+                        width: column.width, child: Text(column.text(item))),
               ),
           ],
           actions: (item) => _actions(item, notifier),
@@ -324,7 +342,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.nameOf(item), style: Theme.of(context).textTheme.titleMedium),
+        Text(widget.nameOf(item),
+            style: Theme.of(context).textTheme.titleMedium),
         if (deleted != null) ...[
           const SizedBox(height: 6),
           const DeletedBadge(),
@@ -346,7 +365,9 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
         icon: const Icon(Icons.open_in_new),
       ),
       if (context.watch<AuthNotifier>().can(
-            widget.basePath == '/customers' ? Operation.manageCustomers : Operation.manageCatalog,
+            widget.basePath == '/customers'
+                ? Operation.manageCustomers
+                : Operation.manageCatalog,
           ))
         IconButton(
           visualDensity: VisualDensity.compact,
@@ -354,14 +375,16 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
           onPressed: () => context.go('${widget.basePath}/$id/edit'),
           icon: const Icon(Icons.edit_outlined),
         ),
-      if (!widget.isDeleted(item) && context.watch<AuthNotifier>().can(Operation.softDelete))
+      if (!widget.isDeleted(item) &&
+          context.watch<AuthNotifier>().can(Operation.softDelete))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Скрыть',
           onPressed: () => _softOne(item),
           icon: const Icon(Icons.visibility_off_outlined),
         ),
-      if (widget.isDeleted(item) && context.watch<AuthNotifier>().can(Operation.restore))
+      if (widget.isDeleted(item) &&
+          context.watch<AuthNotifier>().can(Operation.restore))
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: 'Восстановить',
@@ -373,7 +396,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
           visualDensity: VisualDensity.compact,
           tooltip: 'Удалить навсегда',
           onPressed: () => _hardOne(item),
-          icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+          icon: Icon(Icons.delete_forever_outlined,
+              color: Theme.of(context).colorScheme.error),
         ),
     ];
   }
@@ -384,19 +408,22 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
     if (message == null || !mounted) return false;
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => narrowDialog(AlertDialog(
         title: const Text('Удаление невозможно'),
         content: Text(message),
         actions: [
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Понятно')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Понятно')),
         ],
-      ),
+      )),
     );
     return true;
   }
 
   Future<void> _deleteSelected(SimpleListNotifier<T, Q> notifier) async {
-    final picked = notifier.result.items.where((item) => notifier.selected.contains(widget.idOf(item)));
+    final picked = notifier.result.items
+        .where((item) => notifier.selected.contains(widget.idOf(item)));
     for (final item in picked) {
       if (await _blocked(widget.idOf(item), widget.nameOf(item))) return;
     }
@@ -404,7 +431,8 @@ class _DirectoryBrowserState<T, Q> extends State<DirectoryBrowser<T, Q>> {
     final ok = await confirmAction(
       context,
       title: 'Скрыть выбранные',
-      message: 'Скрыть ${plural(notifier.selected.length, 'запись', 'записи', 'записей')}?',
+      message:
+          'Скрыть ${plural(notifier.selected.length, 'запись', 'записи', 'записей')}?',
       confirmLabel: 'Скрыть',
     );
     if (!ok || !mounted) return;

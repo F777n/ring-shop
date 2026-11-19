@@ -27,7 +27,9 @@ class AppScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-const double kTableBreakpoint = 600;
+const double kSideNavBreakpoint = 600;
+const double kTableBreakpoint = 1100;
+const double kContentMaxWidth = 1440;
 
 const skuTextStyle = TextStyle(
   fontFamily: skuTextStyleFamily,
@@ -42,9 +44,8 @@ ThemeData buildAppTheme(Brightness brightness) {
     primary: brightness == Brightness.light
         ? const Color(0xFF8E1B2C)
         : const Color(0xFFFFB4AB),
-    onPrimary: brightness == Brightness.light
-        ? Colors.white
-        : const Color(0xFF690005),
+    onPrimary:
+        brightness == Brightness.light ? Colors.white : const Color(0xFF690005),
   );
   final rounded = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(16),

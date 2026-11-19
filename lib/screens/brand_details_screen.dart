@@ -131,7 +131,8 @@ class BrandDetailsView extends StatelessWidget {
                   Text('Скрыт ${formatDateTime(brand.deletedAt!)}'),
                   const SizedBox(height: 12),
                 ],
-                Text(brand.name, style: Theme.of(context).textTheme.headlineSmall),
+                Text(brand.name,
+                    style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 16),
                 Wrap(
                   spacing: 24,
@@ -161,7 +162,8 @@ class BrandDetailsView extends StatelessWidget {
                     ),
                     SizedBox(
                       width: 280,
-                      child: DetailLine(label: 'Категории', value: notifier.categories),
+                      child: DetailLine(
+                          label: 'Категории', value: notifier.categories),
                     ),
                     SizedBox(
                       width: 220,
@@ -197,13 +199,15 @@ class BrandDetailsView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (!brand.isDeleted && context.watch<AuthNotifier>().can(Operation.softDelete))
+                    if (!brand.isDeleted &&
+                        context.watch<AuthNotifier>().can(Operation.softDelete))
                       OutlinedButton.icon(
                         onPressed: () => _soft(context, notifier),
                         icon: const Icon(Icons.visibility_off_outlined),
                         label: const Text('Скрыть'),
                       ),
-                    if (brand.isDeleted && context.watch<AuthNotifier>().can(Operation.restore))
+                    if (brand.isDeleted &&
+                        context.watch<AuthNotifier>().can(Operation.restore))
                       FilledButton.tonalIcon(
                         onPressed: () => _restore(context, notifier),
                         icon: const Icon(Icons.restore),
@@ -211,14 +215,14 @@ class BrandDetailsView extends StatelessWidget {
                       ),
                     if (context.watch<AuthNotifier>().can(Operation.hardDelete))
                       FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: scheme.error,
-                        foregroundColor: scheme.onError,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: scheme.error,
+                          foregroundColor: scheme.onError,
+                        ),
+                        onPressed: () => _hard(context, notifier),
+                        icon: const Icon(Icons.delete_forever_outlined),
+                        label: const Text('Удалить навсегда'),
                       ),
-                      onPressed: () => _hard(context, notifier),
-                      icon: const Icon(Icons.delete_forever_outlined),
-                      label: const Text('Удалить навсегда'),
-                    ),
                   ],
                 ),
               ],
@@ -228,23 +232,28 @@ class BrandDetailsView extends StatelessWidget {
     }
   }
 
-  Future<bool> _blocked(BuildContext context, BrandDetailsNotifier notifier) async {
-    final message = linkedDeleteMessage(notifier.brand?.name ?? 'Бренд', notifier.productCount);
+  Future<bool> _blocked(
+      BuildContext context, BrandDetailsNotifier notifier) async {
+    final message = linkedDeleteMessage(
+        notifier.brand?.name ?? 'Бренд', notifier.productCount);
     if (message == null) return false;
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => narrowDialog(AlertDialog(
         title: const Text('Удаление невозможно'),
         content: Text(message),
         actions: [
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Понятно')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Понятно')),
         ],
-      ),
+      )),
     );
     return true;
   }
 
-  Future<void> _soft(BuildContext context, BrandDetailsNotifier notifier) async {
+  Future<void> _soft(
+      BuildContext context, BrandDetailsNotifier notifier) async {
     if (await _blocked(context, notifier)) return;
     if (!context.mounted) return;
     final name = notifier.brand?.name ?? '';
@@ -261,14 +270,16 @@ class BrandDetailsView extends StatelessWidget {
     }
   }
 
-  Future<void> _restore(BuildContext context, BrandDetailsNotifier notifier) async {
+  Future<void> _restore(
+      BuildContext context, BrandDetailsNotifier notifier) async {
     final done = await notifier.restore();
     if (done && context.mounted) {
       await context.read<BrandListNotifier>().load();
     }
   }
 
-  Future<void> _hard(BuildContext context, BrandDetailsNotifier notifier) async {
+  Future<void> _hard(
+      BuildContext context, BrandDetailsNotifier notifier) async {
     if (await _blocked(context, notifier)) return;
     if (!context.mounted) return;
     final name = notifier.brand?.name ?? '';

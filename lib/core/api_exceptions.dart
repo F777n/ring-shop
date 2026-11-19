@@ -10,7 +10,8 @@ sealed class ApiException implements Exception {
 }
 
 class NetworkException extends ApiException {
-  const NetworkException([super.message = 'Сервер недоступен. Проверьте соединение.']);
+  const NetworkException(
+      [super.message = 'Сервер недоступен. Проверьте соединение.']);
 }
 
 class UnauthorizedException extends ApiException {
@@ -18,7 +19,8 @@ class UnauthorizedException extends ApiException {
 }
 
 class ForbiddenException extends ApiException {
-  const ForbiddenException([super.message = 'Недостаточно прав для этого действия.']);
+  const ForbiddenException(
+      [super.message = 'Недостаточно прав для этого действия.']);
 }
 
 class NotFoundException extends ApiException {
@@ -36,7 +38,8 @@ class ValidationException extends ApiException {
 }
 
 class ServerException extends ApiException {
-  const ServerException([super.message = 'Ошибка на сервере. Попробуйте позже.']);
+  const ServerException(
+      [super.message = 'Ошибка на сервере. Попробуйте позже.']);
 }
 
 class RequestCancelled extends ApiException {
@@ -44,16 +47,20 @@ class RequestCancelled extends ApiException {
 }
 
 ApiException mapHttpError(int status, dynamic body) {
-  final message = body is Map && body['message'] is String ? body['message'] as String : null;
+  final message = body is Map && body['message'] is String
+      ? body['message'] as String
+      : null;
   return switch (status) {
     401 => UnauthorizedException(message ?? 'Требуется вход в систему.'),
-    403 => ForbiddenException(message ?? 'Недостаточно прав для этого действия.'),
+    403 =>
+      ForbiddenException(message ?? 'Недостаточно прав для этого действия.'),
     404 => NotFoundException(message ?? 'Запись не найдена.'),
     409 => ConflictException(message ?? 'Операция невозможна.'),
     422 => ValidationException(
         message ?? 'Ошибка валидации',
         body is Map && body['errors'] is Map
-            ? (body['errors'] as Map).map((key, value) => MapEntry('$key', '$value'))
+            ? (body['errors'] as Map)
+                .map((key, value) => MapEntry('$key', '$value'))
             : const {},
       ),
     _ => ServerException(message ?? 'Неизвестная ошибка (код $status).'),

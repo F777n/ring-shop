@@ -47,7 +47,9 @@ class _CounterScreenState extends State<CounterScreen> {
       final sales = await desk.sales();
       if (!mounted) return;
       setState(() {
-        _products = products.items.where((item) => !item.isDeleted && item.stockAvailable > 0).toList();
+        _products = products.items
+            .where((item) => !item.isDeleted && item.stockAvailable > 0)
+            .toList();
         _customers = customers.items.where((item) => !item.isDeleted).toList();
         _sales = sales;
         _productId ??= _products.isEmpty ? null : _products.first.id;
@@ -66,13 +68,17 @@ class _CounterScreenState extends State<CounterScreen> {
     if (productId == null || customerId == null || _busy) return;
     setState(() => _busy = true);
     try {
-      await context.read<DeskApi>().openSale(productId: productId, customerId: customerId);
+      await context
+          .read<DeskApi>()
+          .openSale(productId: productId, customerId: customerId);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Продажа оформлена.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Продажа оформлена.')));
       await _load();
     } on ApiException catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -82,11 +88,13 @@ class _CounterScreenState extends State<CounterScreen> {
     try {
       await context.read<DeskApi>().closeSale(sale.id);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Продажа закрыта.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Продажа закрыта.')));
       await _load();
     } on ApiException catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 
@@ -97,10 +105,13 @@ class _CounterScreenState extends State<CounterScreen> {
       children: [
         Text('Касса', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
-        const Text('Экран продавца: оформить продажу и закрыть её. Покупатель и администратор сюда не попадают.'),
+        const Text(
+            'Экран продавца: оформить продажу и закрыть её. Покупатель и администратор сюда не попадают.'),
         const SizedBox(height: 16),
         if (_loading) const LinearProgressIndicator(),
-        if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        if (_error != null)
+          Text(_error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
         if (_products.isNotEmpty && _customers.isNotEmpty) ...[
           DropdownButtonFormField<int>(
             value: _productId,
@@ -117,7 +128,8 @@ class _CounterScreenState extends State<CounterScreen> {
             decoration: const InputDecoration(labelText: 'Клиент'),
             items: [
               for (final customer in _customers)
-                DropdownMenuItem(value: customer.id, child: Text(customer.fullName)),
+                DropdownMenuItem(
+                    value: customer.id, child: Text(customer.fullName)),
             ],
             onChanged: (value) => setState(() => _customerId = value),
           ),
@@ -131,12 +143,14 @@ class _CounterScreenState extends State<CounterScreen> {
           ),
         ],
         const SizedBox(height: 20),
-        Text('Открытые продажи', style: Theme.of(context).textTheme.titleMedium),
+        Text('Открытые продажи',
+            style: Theme.of(context).textTheme.titleMedium),
         for (final sale in _sales.where((item) => item.isOpen))
           ListTile(
             title: Text(sale.productName),
             subtitle: Text(sale.customerName),
-            trailing: OutlinedButton(onPressed: () => _close(sale), child: const Text('Закрыть')),
+            trailing: OutlinedButton(
+                onPressed: () => _close(sale), child: const Text('Закрыть')),
           ),
       ],
     );

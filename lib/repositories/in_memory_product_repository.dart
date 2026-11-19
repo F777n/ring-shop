@@ -13,8 +13,8 @@ class InMemoryProductRepository implements ProductRepository {
     this.gate,
   }) : _items = List<Product>.of(products ?? buildSeedProducts()) {
     _nextId = _items.fold<int>(0, (max, item) {
-      return item.id > max ? item.id : max;
-    }) +
+          return item.id > max ? item.id : max;
+        }) +
         1;
   }
 
@@ -33,7 +33,8 @@ class InMemoryProductRepository implements ProductRepository {
   @override
   Future<PageResult<Product>> find(ProductQuery q) async {
     await Future.delayed(latency);
-    var rows = _items.where((item) => q.includeDeleted || !item.isDeleted).toList();
+    var rows =
+        _items.where((item) => q.includeDeleted || !item.isDeleted).toList();
     final needle = q.search.trim().toLowerCase();
     if (needle.isNotEmpty) {
       rows = rows
@@ -45,7 +46,9 @@ class InMemoryProductRepository implements ProductRepository {
           .toList();
     }
     if (q.categoryId != null) {
-      rows = rows.where((item) => item.categoryIds.contains(q.categoryId)).toList();
+      rows = rows
+          .where((item) => item.categoryIds.contains(q.categoryId))
+          .toList();
     }
     if (q.brandId != null) {
       rows = rows.where((item) => item.brandId == q.brandId).toList();
@@ -77,11 +80,16 @@ class InMemoryProductRepository implements ProductRepository {
   }
 
   @override
-  Future<int> countLinked({int? brandId, int? categoryId, int? disciplineId}) async {
+  Future<int> countLinked(
+      {int? brandId, int? categoryId, int? disciplineId}) async {
     return _items.where((item) {
       if (brandId != null && item.brandId != brandId) return false;
-      if (categoryId != null && !item.categoryIds.contains(categoryId)) return false;
-      if (disciplineId != null && !item.disciplineIds.contains(disciplineId)) return false;
+      if (categoryId != null && !item.categoryIds.contains(categoryId)) {
+        return false;
+      }
+      if (disciplineId != null && !item.disciplineIds.contains(disciplineId)) {
+        return false;
+      }
       return brandId != null || categoryId != null || disciplineId != null;
     }).length;
   }
@@ -100,7 +108,8 @@ class InMemoryProductRepository implements ProductRepository {
     final current = await findById(id);
     if (current == null) throw const NotFoundException('Товар не найден.');
     if (current.stockAvailable <= 0) {
-      throw ConflictException('Нет свободного остатка: «${current.name}» продать нельзя.');
+      throw ConflictException(
+          'Нет свободного остатка: «${current.name}» продать нельзя.');
     }
     return update(current.copyWith(stockAvailable: current.stockAvailable - 1));
   }
@@ -108,7 +117,8 @@ class InMemoryProductRepository implements ProductRepository {
   @override
   Future<Product> create(Product draft) async {
     if (await isSkuTaken(draft.sku)) {
-      throw const ValidationException('Ошибка валидации', {'sku': 'Такой артикул уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'sku': 'Такой артикул уже есть'});
     }
     final created = Product(
       id: _nextId++,
@@ -131,7 +141,8 @@ class InMemoryProductRepository implements ProductRepository {
   @override
   Future<Product> update(Product product) async {
     if (await isSkuTaken(product.sku, exceptId: product.id)) {
-      throw const ValidationException('Ошибка валидации', {'sku': 'Такой артикул уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'sku': 'Такой артикул уже есть'});
     }
     final index = _items.indexWhere((item) => item.id == product.id);
     if (index == -1) throw StateError('Товар ${product.id} не найден');
@@ -171,7 +182,8 @@ class InMemoryProductRepository implements ProductRepository {
     // Проверять нужно флаг самого элемента и не считать уже скрытые записи.
     var count = 0;
     for (final id in ids) {
-      final index = _items.indexWhere((item) => item.id == id && !item.isDeleted);
+      final index =
+          _items.indexWhere((item) => item.id == id && !item.isDeleted);
       if (index == -1) continue;
       _items[index] = _items[index].copyWith(deletedAt: DateTime.now());
       count++;

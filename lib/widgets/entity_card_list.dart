@@ -22,43 +22,57 @@ class EntityCardList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(bottom: 8),
-      itemCount: items.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        final id = idOf(item);
-        final dimmed = isDimmed?.call(item) ?? false;
-        final scheme = Theme.of(context).colorScheme;
-        return Card(
-          color: dimmed ? scheme.errorContainer.withOpacity(0.35) : null,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(4, 8, 8, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (onToggleSelect != null)
-                      Checkbox(
-                        value: selected.contains(id),
-                        onChanged: (_) => onToggleSelect!(id),
-                      ),
-                    Expanded(child: body(context, item)),
-                  ],
-                ),
-                if (actions != null)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Wrap(children: actions!(item)),
-                  ),
-              ],
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final full =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : 360.0;
+        final columns = full >= 560 ? 2 : 1;
+        final width = columns == 1 ? full : (full - 12) / 2;
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final item in items)
+                SizedBox(width: width, child: _card(context, item)),
+            ],
           ),
         );
       },
+    );
+  }
+
+  Widget _card(BuildContext context, T item) {
+    final id = idOf(item);
+    final dimmed = isDimmed?.call(item) ?? false;
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      color: dimmed ? scheme.errorContainer.withOpacity(0.35) : null,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 8, 8, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (onToggleSelect != null)
+                  Checkbox(
+                    value: selected.contains(id),
+                    onChanged: (_) => onToggleSelect!(id),
+                  ),
+                Expanded(child: body(context, item)),
+              ],
+            ),
+            if (actions != null)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(children: actions!(item)),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

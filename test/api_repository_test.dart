@@ -10,7 +10,8 @@ import 'package:ring_shop/models/product_query.dart';
 import 'package:ring_shop/repositories/api_repositories.dart';
 
 void main() {
-  Dio scripted(Future<ResponseBody> Function(RequestOptions options) onFetch, {List<Duration>? delays}) {
+  Dio scripted(Future<ResponseBody> Function(RequestOptions options) onFetch,
+      {List<Duration>? delays}) {
     final dio = buildDio(retryDelays: delays ?? const []);
     dio.httpClientAdapter = _Script(onFetch);
     return dio;
@@ -51,7 +52,8 @@ void main() {
         'total': 24,
       }, 200);
     });
-    final page = await ApiProductRepository(dio).find(const ProductQuery(search: 'перч', page: 2));
+    final page = await ApiProductRepository(dio)
+        .find(const ProductQuery(search: 'перч', page: 2));
     expect(page.items.single.sku, 'WN-GL-600');
     expect(page.page, 2);
     expect(page.total, 24);
@@ -110,14 +112,16 @@ void main() {
         ),
       ),
       throwsA(
-        isA<ValidationException>().having((error) => error.errors['sku'], 'sku', 'Такой артикул уже есть'),
+        isA<ValidationException>().having(
+            (error) => error.errors['sku'], 'sku', 'Такой артикул уже есть'),
       ),
     );
   });
 
   test('недоступный сервер становится сетевой ошибкой', () async {
     final dio = scripted((options) async {
-      throw DioException(requestOptions: options, type: DioExceptionType.connectionError);
+      throw DioException(
+          requestOptions: options, type: DioExceptionType.connectionError);
     });
     expect(
       () => ApiProductRepository(dio).find(const ProductQuery()),
@@ -127,7 +131,8 @@ void main() {
 
   test('конфликт 409 при продаже без остатка', () async {
     final dio = scripted((options) async {
-      return jsonBody({'message': 'Нет свободного остатка: «Leone» продать нельзя.'}, 409);
+      return jsonBody(
+          {'message': 'Нет свободного остатка: «Leone» продать нельзя.'}, 409);
     });
     expect(
       () => ApiProductRepository(dio).sell(24),
@@ -140,7 +145,8 @@ void main() {
     final dio = scripted(
       (options) async {
         calls += 1;
-        throw DioException(requestOptions: options, type: DioExceptionType.connectionError);
+        throw DioException(
+            requestOptions: options, type: DioExceptionType.connectionError);
       },
       delays: const [Duration.zero, Duration.zero],
     );

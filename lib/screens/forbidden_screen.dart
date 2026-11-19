@@ -19,9 +19,11 @@ class ForbiddenScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.lock_outline, size: 48, color: Theme.of(context).colorScheme.error),
+                Icon(Icons.lock_outline,
+                    size: 48, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: 12),
-                Text('Недостаточно прав', style: Theme.of(context).textTheme.headlineSmall),
+                Text('Недостаточно прав',
+                    style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 const Text(
                   'Этот адрес закрыт для вашей роли. Проверка на экране скрывает лишние кнопки, а этот экран останавливает переход по ссылке.',

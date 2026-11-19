@@ -19,12 +19,13 @@ import 'screens/brand_form_screen.dart';
 import 'screens/brand_list_screen.dart';
 import 'screens/directory_form_screens.dart';
 import 'screens/directory_pages.dart';
-import 'screens/admin_screen.dart';
-import 'screens/counter_screen.dart';
 import 'screens/forbidden_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_found_screen.dart';
-import 'screens/orders_screen.dart';
+import 'screens/admin_screen.dart' deferred as admin_lib;
+import 'screens/counter_screen.dart' deferred as counter_lib;
+import 'screens/orders_screen.dart' deferred as orders_lib;
+import 'widgets/deferred_view.dart';
 import 'screens/product_details_screen.dart';
 import 'screens/product_form_screen.dart';
 import 'screens/product_list_screen.dart';
@@ -48,7 +49,9 @@ GoRouter createRouter(AuthNotifier auth) {
         if (from != null && _safeReturn(auth, from)) return from;
         return '/products';
       }
-      if (logged && path != '/forbidden' && !auth.allowsPath(path)) return '/forbidden';
+      if (logged && path != '/forbidden' && !auth.allowsPath(path)) {
+        return '/forbidden';
+      }
       if (path == '/') return '/products';
       return null;
     },
@@ -58,51 +61,79 @@ GoRouter createRouter(AuthNotifier auth) {
     routes: [
       GoRoute(
         path: '/login',
-        builder: (context, state) => LoginScreen(from: state.uri.queryParameters['from']),
+        builder: (context, state) =>
+            LoginScreen(from: state.uri.queryParameters['from']),
       ),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
-      GoRoute(path: '/forbidden', builder: (context, state) => const ForbiddenScreen()),
+      GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterScreen()),
+      GoRoute(
+          path: '/forbidden',
+          builder: (context, state) => const ForbiddenScreen()),
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           _section(
             path: '/products',
-            list: (state) => ProductListScreen(query: ProductQuery.fromUri(state.uri)),
+            list: (state) =>
+                ProductListScreen(query: ProductQuery.fromUri(state.uri)),
             create: const ProductFormScreen(),
             details: (id) => ProductDetailsPage(id: id),
             edit: (id) => ProductFormScreen(id: id),
           ),
           _section(
             path: '/brands',
-            list: (state) => BrandListScreen(query: BrandQuery.fromUri(state.uri)),
+            list: (state) =>
+                BrandListScreen(query: BrandQuery.fromUri(state.uri)),
             create: const BrandFormScreen(),
             details: (id) => BrandDetailsPage(id: id),
             edit: (id) => BrandFormScreen(id: id),
           ),
           _section(
             path: '/categories',
-            list: (state) => CategoryListScreen(query: CategoryQuery.fromUri(state.uri)),
+            list: (state) =>
+                CategoryListScreen(query: CategoryQuery.fromUri(state.uri)),
             create: const CategoryFormScreen(),
             details: (id) => _categoryDetails(id),
             edit: (id) => CategoryFormScreen(id: id),
           ),
           _section(
             path: '/disciplines',
-            list: (state) => DisciplineListScreen(query: DisciplineQuery.fromUri(state.uri)),
+            list: (state) =>
+                DisciplineListScreen(query: DisciplineQuery.fromUri(state.uri)),
             create: const DisciplineFormScreen(),
             details: (id) => _disciplineDetails(id),
             edit: (id) => DisciplineFormScreen(id: id),
           ),
           _section(
             path: '/customers',
-            list: (state) => CustomerListScreen(query: CustomerQuery.fromUri(state.uri)),
+            list: (state) =>
+                CustomerListScreen(query: CustomerQuery.fromUri(state.uri)),
             create: const CustomerFormScreen(),
             details: (id) => _customerDetails(id),
             edit: (id) => CustomerFormScreen(id: id),
           ),
-          GoRoute(path: '/orders', builder: (context, state) => const OrdersScreen()),
-          GoRoute(path: '/counter', builder: (context, state) => const CounterScreen()),
-          GoRoute(path: '/admin', builder: (context, state) => const AdminScreen()),
+          GoRoute(
+            path: '/orders',
+            builder: (context, state) => DeferredView(
+              load: orders_lib.loadLibrary,
+              builder: () => orders_lib.OrdersScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/counter',
+            builder: (context, state) => DeferredView(
+              load: counter_lib.loadLibrary,
+              builder: () => counter_lib.CounterScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin',
+            builder: (context, state) => DeferredView(
+              load: admin_lib.loadLibrary,
+              builder: () => admin_lib.AdminScreen(),
+            ),
+          ),
         ],
       ),
     ],
@@ -188,7 +219,8 @@ Widget _disciplineDetails(int id) {
     builder: (context) {
       final repository = context.read<DisciplineRepository>();
       final products = context.read<ProductRepository>();
-      final list = context.read<SimpleListNotifier<Discipline, DisciplineQuery>>();
+      final list =
+          context.read<SimpleListNotifier<Discipline, DisciplineQuery>>();
       return RecordDetailsPage(
         id: id,
         back: context.read<ListLocationMemory>().disciplines,

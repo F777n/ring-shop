@@ -42,7 +42,8 @@ Map<String, dynamic>? readMap(Object? value) {
   return null;
 }
 
-List<T> readModels<T>(Object? raw, T Function(Map<String, dynamic> json) decode) {
+List<T> readModels<T>(
+    Object? raw, T Function(Map<String, dynamic> json) decode) {
   if (raw is! List) return <T>[];
   final result = <T>[];
   for (final item in raw) {

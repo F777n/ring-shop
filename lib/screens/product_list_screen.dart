@@ -110,16 +110,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ? PaginationBar(
               page: notifier.result.page,
               totalPages: notifier.result.totalPages,
-              totalLabel: plural(notifier.result.total, 'товар', 'товара', 'товаров'),
+              totalLabel:
+                  plural(notifier.result.total, 'товар', 'товара', 'товаров'),
               size: query.size,
-              onPage: (page) => goProductQuery(context, query.copyWith(page: page)),
-              onSize: (size) => goProductQuery(context, query.copyWith(size: size)),
+              onPage: (page) =>
+                  goProductQuery(context, query.copyWith(page: page)),
+              onSize: (size) =>
+                  goProductQuery(context, query.copyWith(size: size)),
             )
           : const SizedBox(height: 48),
     );
   }
 
-  Widget _filters(ProductQuery query, ProductListNotifier notifier, bool cards) {
+  Widget _filters(
+      ProductQuery query, ProductListNotifier notifier, bool cards) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -152,10 +156,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   width: fieldWidth,
                   child: FilterDropdown<int>(
                     label: 'Категория',
-                    value: _knownId(query.categoryId, notifier.categories.map((c) => c.id)),
+                    value: _knownId(
+                        query.categoryId, notifier.categories.map((c) => c.id)),
                     items: _categoryItems(notifier, query.categoryId),
                     onChanged: (value) {
-                      goProductQuery(context, query.copyWith(categoryId: value));
+                      goProductQuery(
+                          context, query.copyWith(categoryId: value));
                     },
                   ),
                 ),
@@ -163,7 +169,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   width: fieldWidth,
                   child: FilterDropdown<int>(
                     label: 'Бренд',
-                    value: _knownId(query.brandId, notifier.brandOptions.map((b) => b.id)),
+                    value: _knownId(
+                        query.brandId, notifier.brandOptions.map((b) => b.id)),
                     items: _brandItems(notifier, query.brandId),
                     onChanged: (value) {
                       goProductQuery(context, query.copyWith(brandId: value));
@@ -194,7 +201,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   label: const Text('Показывать удалённые'),
                   selected: query.includeDeleted,
                   onSelected: (value) {
-                    goProductQuery(context, query.copyWith(includeDeleted: value));
+                    goProductQuery(
+                        context, query.copyWith(includeDeleted: value));
                   },
                 ),
                 TextButton.icon(
@@ -323,7 +331,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 : () => goProductQuery(context, const ProductQuery()),
           );
         }
-        final canSelect = context.watch<AuthNotifier>().can(Operation.softDelete);
+        final canSelect =
+            context.watch<AuthNotifier>().can(Operation.softDelete);
         if (cards) {
           return EntityCardList<Product>(
             items: notifier.result.items,
@@ -370,14 +379,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
               label: 'Бренд',
               build: (item) => SizedBox(
                 width: 130,
-                child: Text(notifier.brandName(item.brandId)),
+                child: Text(
+                  notifier.brandName(item.brandId),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             TableColumnSpec(
               label: 'Категория',
               build: (item) => SizedBox(
                 width: 170,
-                child: Text(notifier.categoryNames(item.categoryIds)),
+                child: Text(
+                  notifier.categoryNames(item.categoryIds),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             TableColumnSpec(
@@ -415,6 +432,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
       children: [
         Text(
           item.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 decoration: item.isDeleted ? TextDecoration.lineThrough : null,
               ),
@@ -426,12 +445,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
         const SizedBox(height: 6),
         Text(
           formatRubles(item.priceRub),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: scheme.primary),
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(color: scheme.primary),
         ),
         const SizedBox(height: 6),
         Text('Артикул ${item.sku}', style: skuTextStyle),
-        Text('${notifier.brandName(item.brandId)} · ${notifier.categoryNames(item.categoryIds)}'),
-        Text('Год ${item.year} · на складе ${item.stockAvailable} из ${item.stockTotal}'),
+        Text(
+          '${notifier.brandName(item.brandId)} · ${notifier.categoryNames(item.categoryIds)}',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+            'Год ${item.year} · на складе ${item.stockAvailable} из ${item.stockTotal}'),
       ],
     );
   }
@@ -439,13 +466,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _nameCell(Product item) {
     return SizedBox(
       width: 250,
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             item.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: item.isDeleted
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : null,
@@ -499,8 +526,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     final ok = await confirmAction(
       context,
       title: 'Скрыть выбранные',
-      message:
-          'Скрыть ${plural(count, 'товар', 'товара', 'товаров')}? '
+      message: 'Скрыть ${plural(count, 'товар', 'товара', 'товаров')}? '
           'Они получат метку deletedAt и пропадут из каталога, '
           'пока не включён показ удалённых.',
       confirmLabel: 'Скрыть',
@@ -561,7 +587,8 @@ List<DropdownMenuItem<int?>> _categoryItems(
     for (final category in notifier.categories)
       DropdownMenuItem(value: category.id, child: Text(category.name)),
   ];
-  if (selected != null && !notifier.categories.any((item) => item.id == selected)) {
+  if (selected != null &&
+      !notifier.categories.any((item) => item.id == selected)) {
     items.add(
       DropdownMenuItem(
         value: selected,
@@ -581,9 +608,11 @@ List<DropdownMenuItem<int?>> _brandItems(
     for (final brand in notifier.brandOptions)
       DropdownMenuItem(value: brand.id, child: Text(brand.name)),
   ];
-  if (selected != null && !notifier.brandOptions.any((item) => item.id == selected)) {
+  if (selected != null &&
+      !notifier.brandOptions.any((item) => item.id == selected)) {
     items.add(
-      DropdownMenuItem(value: selected, child: Text(notifier.brandName(selected))),
+      DropdownMenuItem(
+          value: selected, child: Text(notifier.brandName(selected))),
     );
   }
   return items;

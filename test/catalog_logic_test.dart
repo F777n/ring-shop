@@ -61,7 +61,8 @@ void main() {
     expect(original.toLocation(), contains('deleted=1'));
   });
 
-  test('битый размер страницы и сортировка заменяются значениями по умолчанию', () {
+  test('битый размер страницы и сортировка заменяются значениями по умолчанию',
+      () {
     final query = ProductQuery.fromUri(
       Uri.parse('/products?size=7&sort=nope,desc&page=0'),
     );
@@ -73,8 +74,8 @@ void main() {
 
   test('clearDeletedAt отличает сброс от «не менять»', () {
     final hidden = buildSeedProducts().first.copyWith(
-      deletedAt: DateTime.utc(2026, 1, 1),
-    );
+          deletedAt: DateTime.utc(2026, 1, 1),
+        );
     expect(hidden.copyWith(name: 'Другое').isDeleted, isTrue);
     expect(hidden.copyWith(clearDeletedAt: true).deletedAt, isNull);
   });
@@ -94,7 +95,8 @@ void main() {
     expect(page.items, isNotEmpty);
     expect(page.items.every((item) => item.brandId == 1), isTrue);
     expect(page.items.every((item) => item.categoryIds.contains(1)), isTrue);
-    expect(page.items.every((item) => item.year >= 2020 && item.year <= 2024), isTrue);
+    expect(page.items.every((item) => item.year >= 2020 && item.year <= 2024),
+        isTrue);
 
     final bySku = await repo.find(const ProductQuery(search: 'ev-gl-10'));
     expect(bySku.total, 1);
@@ -190,7 +192,8 @@ void main() {
     expect(withDeleted.total, 1);
 
     final parsed = BrandQuery.fromUri(
-      Uri.parse(const BrandQuery(search: 'япония', country: 'Япония', page: 2).toLocation()),
+      Uri.parse(const BrandQuery(search: 'япония', country: 'Япония', page: 2)
+          .toLocation()),
     );
     expect(parsed.search, 'япония');
     expect(parsed.country, 'Япония');

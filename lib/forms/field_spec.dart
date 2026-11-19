@@ -20,6 +20,7 @@ class TextFieldSpec extends FieldSpec {
     this.formatters = const [],
     this.maxLines = 1,
     this.style,
+    this.compact = false,
   }) : super(id);
 
   final String label;
@@ -31,6 +32,7 @@ class TextFieldSpec extends FieldSpec {
   final List<TextInputFormatter> formatters;
   final int maxLines;
   final TextStyle? style;
+  final bool compact;
 }
 
 class IntChoiceSpec extends FieldSpec {
@@ -124,12 +126,14 @@ class RuPhoneFormatter extends TextInputFormatter {
   static const prefix = '+7';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     final national = nationalDigits(newValue.text);
     final text = '$prefix$national';
     return TextEditingValue(
       text: text,
-      selection: TextSelection.collapsed(offset: _offset(newValue, text.length)),
+      selection:
+          TextSelection.collapsed(offset: _offset(newValue, text.length)),
     );
   }
 
@@ -142,7 +146,8 @@ class RuPhoneFormatter extends TextInputFormatter {
 
   static int _offset(TextEditingValue value, int length) {
     final end = value.selection.extentOffset.clamp(0, value.text.length);
-    var digitsBefore = value.text.substring(0, end).replaceAll(RegExp(r'\D'), '').length;
+    var digitsBefore =
+        value.text.substring(0, end).replaceAll(RegExp(r'\D'), '').length;
     if (digitsBefore > 0) digitsBefore -= 1;
     final mapped = prefix.length + digitsBefore;
     if (mapped < prefix.length) return prefix.length;

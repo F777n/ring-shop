@@ -90,7 +90,9 @@ class InMemoryCategoryRepository implements CategoryRepository {
   @override
   Future<PageResult<Category>> find(CategoryQuery q) async {
     await _table.pause();
-    var rows = _table.items.where((item) => q.includeDeleted || !item.isDeleted).toList();
+    var rows = _table.items
+        .where((item) => q.includeDeleted || !item.isDeleted)
+        .toList();
     final needle = q.search.trim().toLowerCase();
     if (needle.isNotEmpty) {
       rows = rows
@@ -101,7 +103,9 @@ class InMemoryCategoryRepository implements CategoryRepository {
           )
           .toList();
     }
-    if (q.kind != null) rows = rows.where((item) => item.kind == q.kind).toList();
+    if (q.kind != null) {
+      rows = rows.where((item) => item.kind == q.kind).toList();
+    }
     if (q.yearFrom != null) {
       rows = rows.where((item) => item.introducedYear >= q.yearFrom!).toList();
     }
@@ -122,7 +126,8 @@ class InMemoryCategoryRepository implements CategoryRepository {
   @override
   Future<Category> create(Category category) async {
     if (await isCodeTaken(category.code)) {
-      throw const ValidationException('Ошибка валидации', {'code': 'Такой код уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'code': 'Такой код уже есть'});
     }
     return _table.create(category);
   }
@@ -130,7 +135,8 @@ class InMemoryCategoryRepository implements CategoryRepository {
   @override
   Future<Category> update(Category category) async {
     if (await isCodeTaken(category.code, exceptId: category.id)) {
-      throw const ValidationException('Ошибка валидации', {'code': 'Такой код уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'code': 'Такой код уже есть'});
     }
     return _table.update(category, 'Категория ${category.id} не найдена');
   }
@@ -145,11 +151,13 @@ class InMemoryCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<void> hardDelete(int id) => _table.hardDelete(id, 'Категория $id не найдена');
+  Future<void> hardDelete(int id) =>
+      _table.hardDelete(id, 'Категория $id не найдена');
 
   @override
   Future<void> restore(int id) {
-    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true), 'Категория $id не найдена');
+    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true),
+        'Категория $id не найдена');
   }
 
   @override
@@ -194,7 +202,9 @@ class InMemoryDisciplineRepository implements DisciplineRepository {
   @override
   Future<PageResult<Discipline>> find(DisciplineQuery q) async {
     await _table.pause();
-    var rows = _table.items.where((item) => q.includeDeleted || !item.isDeleted).toList();
+    var rows = _table.items
+        .where((item) => q.includeDeleted || !item.isDeleted)
+        .toList();
     final needle = q.search.trim().toLowerCase();
     if (needle.isNotEmpty) {
       rows = rows
@@ -205,7 +215,9 @@ class InMemoryDisciplineRepository implements DisciplineRepository {
           )
           .toList();
     }
-    if (q.country != null) rows = rows.where((item) => item.country == q.country).toList();
+    if (q.country != null) {
+      rows = rows.where((item) => item.country == q.country).toList();
+    }
     if (q.yearFrom != null) {
       rows = rows.where((item) => item.establishedYear >= q.yearFrom!).toList();
     }
@@ -241,11 +253,13 @@ class InMemoryDisciplineRepository implements DisciplineRepository {
   }
 
   @override
-  Future<void> hardDelete(int id) => _table.hardDelete(id, 'Дисциплина $id не найдена');
+  Future<void> hardDelete(int id) =>
+      _table.hardDelete(id, 'Дисциплина $id не найдена');
 
   @override
   Future<void> restore(int id) {
-    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true), 'Дисциплина $id не найдена');
+    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true),
+        'Дисциплина $id не найдена');
   }
 
   @override
@@ -294,14 +308,17 @@ class InMemoryCustomerRepository implements CustomerRepository {
     final needle = email.trim().toLowerCase();
     if (needle.isEmpty) return false;
     return _table.items.any(
-      (item) => item.id != exceptId && item.email.trim().toLowerCase() == needle,
+      (item) =>
+          item.id != exceptId && item.email.trim().toLowerCase() == needle,
     );
   }
 
   @override
   Future<PageResult<Customer>> find(CustomerQuery q) async {
     await _table.pause();
-    var rows = _table.items.where((item) => q.includeDeleted || !item.isDeleted).toList();
+    var rows = _table.items
+        .where((item) => q.includeDeleted || !item.isDeleted)
+        .toList();
     final needle = q.search.trim().toLowerCase();
     if (needle.isNotEmpty) {
       rows = rows
@@ -313,12 +330,18 @@ class InMemoryCustomerRepository implements CustomerRepository {
           )
           .toList();
     }
-    if (q.city != null) rows = rows.where((item) => item.city == q.city).toList();
+    if (q.city != null) {
+      rows = rows.where((item) => item.city == q.city).toList();
+    }
     if (q.cardActive != null) {
       rows = rows.where((item) => item.card.active == q.cardActive).toList();
     }
-    if (q.yearFrom != null) rows = rows.where((item) => item.birthYear >= q.yearFrom!).toList();
-    if (q.yearTo != null) rows = rows.where((item) => item.birthYear <= q.yearTo!).toList();
+    if (q.yearFrom != null) {
+      rows = rows.where((item) => item.birthYear >= q.yearFrom!).toList();
+    }
+    if (q.yearTo != null) {
+      rows = rows.where((item) => item.birthYear <= q.yearTo!).toList();
+    }
     rows.sort((a, b) {
       final result = switch (q.sortField) {
         'email' => a.email.toLowerCase().compareTo(b.email.toLowerCase()),
@@ -333,7 +356,8 @@ class InMemoryCustomerRepository implements CustomerRepository {
   @override
   Future<Customer> create(Customer customer) async {
     if (await isEmailTaken(customer.email)) {
-      throw const ValidationException('Ошибка валидации', {'email': 'Такая почта уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'email': 'Такая почта уже есть'});
     }
     return _table.create(customer);
   }
@@ -341,7 +365,8 @@ class InMemoryCustomerRepository implements CustomerRepository {
   @override
   Future<Customer> update(Customer customer) async {
     if (await isEmailTaken(customer.email, exceptId: customer.id)) {
-      throw const ValidationException('Ошибка валидации', {'email': 'Такая почта уже есть'});
+      throw const ValidationException(
+          'Ошибка валидации', {'email': 'Такая почта уже есть'});
     }
     return _table.update(customer, 'Клиент ${customer.id} не найден');
   }
@@ -356,11 +381,13 @@ class InMemoryCustomerRepository implements CustomerRepository {
   }
 
   @override
-  Future<void> hardDelete(int id) => _table.hardDelete(id, 'Клиент $id не найден');
+  Future<void> hardDelete(int id) =>
+      _table.hardDelete(id, 'Клиент $id не найден');
 
   @override
   Future<void> restore(int id) {
-    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true), 'Клиент $id не найден');
+    return _table.restore(id, (item) => item.copyWith(clearDeletedAt: true),
+        'Клиент $id не найден');
   }
 
   @override

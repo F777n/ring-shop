@@ -9,7 +9,6 @@ import '../auth/auth_api.dart';
 import '../auth/auth_user.dart';
 import '../core/api_exceptions.dart';
 
-
 class AuthBinder {
   AuthNotifier? _auth;
 
@@ -29,11 +28,22 @@ class AuthNotifier extends ChangeNotifier {
     _binder?.attach(this);
   }
 
-  AuthNotifier.preview()
+  AuthNotifier.preview({Role role = Role.admin, bool signedIn = true})
       : _prefs = null,
         _api = null,
         _binder = null,
-        _user = const AppUser(id: 0, username: 'admin', fullName: 'Администратор', role: Role.admin);
+        _user = signedIn
+            ? AppUser(
+                id: 0,
+                username: role.name,
+                fullName: switch (role) {
+                  Role.buyer => 'Иванов Пётр',
+                  Role.seller => 'Петрова Анна',
+                  Role.admin => 'Сидоров Игорь',
+                },
+                role: role,
+              )
+            : null;
 
   static const _kAccess = 'auth_access_token';
   static const _kRefresh = 'auth_refresh_token';
@@ -71,7 +81,9 @@ class AuthNotifier extends ChangeNotifier {
     if (path == '/admin' || path.startsWith('/admin/')) {
       return canDo(current.role, Operation.manageUsers);
     }
-    if (path.startsWith('/customers')) return canDo(current.role, Operation.manageCustomers);
+    if (path.startsWith('/customers')) {
+      return canDo(current.role, Operation.manageCustomers);
+    }
     if (path.startsWith('/brands') ||
         path.startsWith('/categories') ||
         path.startsWith('/disciplines')) {
@@ -79,7 +91,8 @@ class AuthNotifier extends ChangeNotifier {
     }
     if (path.startsWith('/products')) {
       final editing = path.endsWith('/new') || path.endsWith('/edit');
-      return canDo(current.role, editing ? Operation.manageCatalog : Operation.viewCatalog);
+      return canDo(current.role,
+          editing ? Operation.manageCatalog : Operation.viewCatalog);
     }
     return false;
   }
@@ -98,7 +111,8 @@ class AuthNotifier extends ChangeNotifier {
       return;
     }
     final last = _readTime(_kLast);
-    if (last != null && DateTime.now().difference(last) > const Duration(minutes: 3)) {
+    if (last != null &&
+        DateTime.now().difference(last) > const Duration(minutes: 3)) {
       await logout(reason: 'Сессия завершена из-за неактивности.');
       return;
     }
@@ -174,7 +188,8 @@ class AuthNotifier extends ChangeNotifier {
       _sessionEnds = result.sessionExpiresAt;
       await prefs?.setString(_kAccess, result.accessToken);
       await prefs?.setString(_kRefresh, result.refreshToken);
-      await prefs?.setInt(_kUntil, result.sessionExpiresAt.millisecondsSinceEpoch);
+      await prefs?.setInt(
+          _kUntil, result.sessionExpiresAt.millisecondsSinceEpoch);
       return true;
     } catch (_) {
       return false;
@@ -218,7 +233,8 @@ class AuthNotifier extends ChangeNotifier {
     await prefs?.setString(_kRefresh, result.refreshToken);
     await prefs?.setString(roleKey, result.user.role.name);
     await prefs?.setString(_kUser, jsonEncode(result.user.toJson()));
-    await prefs?.setInt(_kUntil, result.sessionExpiresAt.millisecondsSinceEpoch);
+    await prefs?.setInt(
+        _kUntil, result.sessionExpiresAt.millisecondsSinceEpoch);
     touch();
     notifyListeners();
   }

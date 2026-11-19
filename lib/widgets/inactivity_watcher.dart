@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'confirm_dialog.dart';
+
 class InactivityWatcher extends StatefulWidget {
   const InactivityWatcher({
     super.key,
@@ -45,7 +47,8 @@ class _InactivityWatcherState extends State<InactivityWatcher> {
   @override
   void didUpdateWidget(covariant InactivityWatcher oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.enabled != widget.enabled || oldWidget.sessionEnds != widget.sessionEnds) {
+    if (oldWidget.enabled != widget.enabled ||
+        oldWidget.sessionEnds != widget.sessionEnds) {
       _arm();
     }
   }
@@ -90,12 +93,15 @@ class _InactivityWatcherState extends State<InactivityWatcher> {
   }
 
   Future<void> _showWarning() async {
-    if (!mounted || _dialog || !widget.enabled || Navigator.maybeOf(context) == null) return;
+    if (!mounted ||
+        _dialog ||
+        !widget.enabled ||
+        Navigator.maybeOf(context) == null) return;
     _dialog = true;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => narrowDialog(AlertDialog(
         title: const Text('Сессия скоро завершится'),
         content: const Text('Без действий выход произойдёт через 30 секунд.'),
         actions: [
@@ -104,7 +110,7 @@ class _InactivityWatcherState extends State<InactivityWatcher> {
             child: const Text('Я здесь'),
           ),
         ],
-      ),
+      )),
     );
     _dialog = false;
     if (mounted && widget.enabled) _restart();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/api_exceptions.dart';
+import '../core/quiet_retry.dart';
 import '../data/catalog.dart';
 import '../models/brand.dart';
 import '../models/category.dart';
@@ -29,6 +30,7 @@ class ProductListNotifier extends ChangeNotifier {
   bool _brandsReady = false;
   bool _failNext = false;
   int _ticket = 0;
+  final _retry = QuietRetry();
 
   ProductQuery get query => _query;
   PageResult<Product> get result => _result;
@@ -59,11 +61,15 @@ class ProductListNotifier extends ChangeNotifier {
     return ids.map(categoryTitle).join(', ');
   }
 
-  Future<void> load() async {
+  Future<void> load({bool quiet = false}) async {
+    _retry.cancel();
     final ticket = ++_ticket;
-    _status = LoadStatus.loading;
-    _error = null;
-    notifyListeners();
+    if (!quiet) {
+      _status = LoadStatus.loading;
+      _error = null;
+      notifyListeners();
+    }
+    Object? failure;
     try {
       if (_failNext) {
         _failNext = false;
@@ -83,18 +89,28 @@ class ProductListNotifier extends ChangeNotifier {
       return;
     } on ApiException catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } on StateError catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = 'Не удалось загрузить список: $error';
       _status = LoadStatus.error;
     }
+    if (failure != null) _retry.arm(failure, () => load(quiet: true));
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _retry.dispose();
+    super.dispose();
   }
 
   Future<void> applyQuery(ProductQuery next) async {
@@ -136,16 +152,19 @@ class ProductListNotifier extends ChangeNotifier {
 
   Future<void> softDelete(int id) {
     _selected.remove(id);
-    return _mutate(() => _repository.softDelete(id), 'Не удалось скрыть товар.');
+    return _mutate(
+        () => _repository.softDelete(id), 'Не удалось скрыть товар.');
   }
 
   Future<void> hardDelete(int id) {
     _selected.remove(id);
-    return _mutate(() => _repository.hardDelete(id), 'Не удалось удалить товар.');
+    return _mutate(
+        () => _repository.hardDelete(id), 'Не удалось удалить товар.');
   }
 
   Future<void> restore(int id) {
-    return _mutate(() => _repository.restore(id), 'Не удалось восстановить товар.');
+    return _mutate(
+        () => _repository.restore(id), 'Не удалось восстановить товар.');
   }
 
   Future<void> _mutate(

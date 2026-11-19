@@ -65,11 +65,13 @@ class ProductFormScreen extends StatelessWidget {
       title: id == null ? 'Новый товар' : 'Изменение товара',
       submitLabel: id == null ? 'Создать' : 'Сохранить',
       values: values,
-      fields: (current) => _fields(current, brandList, categoryList, disciplineList),
+      fields: (current) =>
+          _fields(current, brandList, categoryList, disciplineList),
     );
   }
 
-  Future<int> _save(ProductRepository products, Map<String, Object?> values) async {
+  Future<int> _save(
+      ProductRepository products, Map<String, Object?> values) async {
     final draft = Product(
       id: id ?? 0,
       name: textValue(values, 'name'),
@@ -127,17 +129,21 @@ List<FieldSpec> _fields(
   final selectedCategories = idValue(values, 'categoryIds');
   final categoryOptions = <ChoiceOption<int>>[
     for (final category in categories)
-      if (brandId != null && !category.isDeleted && allowed.contains(category.id))
+      if (brandId != null &&
+          !category.isDeleted &&
+          allowed.contains(category.id))
         ChoiceOption(category.id, category.name),
   ];
   final visibleBrands = [
     for (final brand in brands)
       if (!brand.isDeleted || brand.id == brandId)
-        ChoiceOption(brand.id, brand.isDeleted ? '${brand.name} (удалён)' : brand.name),
+        ChoiceOption(
+            brand.id, brand.isDeleted ? '${brand.name} (удалён)' : brand.name),
   ];
   final disciplineOptions = [
     for (final discipline in disciplines)
-      if (!discipline.isDeleted || idValue(values, 'disciplineIds').contains(discipline.id))
+      if (!discipline.isDeleted ||
+          idValue(values, 'disciplineIds').contains(discipline.id))
         ChoiceOption(discipline.id, discipline.name),
   ];
   return [
@@ -146,7 +152,8 @@ List<FieldSpec> _fields(
       label: 'Название',
       initialValue: textValue(values, 'name'),
       validator: (value, _) =>
-          requiredText(value, message: 'Укажите название') ?? lengthBetween(value, 2, 120),
+          requiredText(value, message: 'Укажите название') ??
+          lengthBetween(value, 2, 120),
     ),
     TextFieldSpec(
       id: 'sku',
@@ -161,42 +168,51 @@ List<FieldSpec> _fields(
       label: 'Год выпуска',
       initialValue: textValue(values, 'year'),
       digitsOnly: true,
+      compact: true,
       keyboardType: TextInputType.number,
-      validator: (value, _) => intInRange(value, min: 1950, max: 2026, empty: 'Укажите год'),
+      validator: (value, _) =>
+          intInRange(value, min: 1950, max: 2026, empty: 'Укажите год'),
     ),
     TextFieldSpec(
       id: 'priceRub',
       label: 'Цена, ₽',
       initialValue: textValue(values, 'priceRub'),
       digitsOnly: true,
+      compact: true,
       keyboardType: TextInputType.number,
-      validator: (value, _) => intInRange(value, min: 1, max: 1000000, positive: true, empty: 'Укажите цену'),
+      validator: (value, _) => intInRange(value,
+          min: 1, max: 1000000, positive: true, empty: 'Укажите цену'),
     ),
     TextFieldSpec(
       id: 'weightGrams',
       label: 'Вес, г',
       initialValue: textValue(values, 'weightGrams'),
       digitsOnly: true,
+      compact: true,
       keyboardType: TextInputType.number,
-      validator: (value, _) => intInRange(value, min: 1, max: 100000, positive: true, empty: 'Укажите вес'),
+      validator: (value, _) => intInRange(value,
+          min: 1, max: 100000, positive: true, empty: 'Укажите вес'),
     ),
     TextFieldSpec(
       id: 'stockTotal',
       label: 'Всего на складе',
       initialValue: textValue(values, 'stockTotal'),
       digitsOnly: true,
+      compact: true,
       keyboardType: TextInputType.number,
-      validator: (value, _) =>
-          intInRange(value, min: 1, max: 100000, positive: true, empty: 'Укажите количество'),
+      validator: (value, _) => intInRange(value,
+          min: 1, max: 100000, positive: true, empty: 'Укажите количество'),
     ),
     TextFieldSpec(
       id: 'stockAvailable',
       label: 'Доступно',
       initialValue: textValue(values, 'stockAvailable'),
       digitsOnly: true,
+      compact: true,
       keyboardType: TextInputType.number,
       validator: (value, texts) {
-        final error = intInRange(value, min: 0, max: 100000, empty: 'Укажите остаток');
+        final error =
+            intInRange(value, min: 0, max: 100000, empty: 'Укажите остаток');
         if (error != null) return error;
         final total = int.tryParse((texts['stockTotal'] ?? '').trim());
         final available = int.tryParse((value ?? '').trim());
@@ -230,7 +246,8 @@ List<FieldSpec> _fields(
       values: idValue(values, 'disciplineIds'),
       options: disciplineOptions,
       hint: 'Отметьте, для каких единоборств подходит товар',
-      validator: (value) => requiredIds(value, 'Выберите хотя бы одну дисциплину'),
+      validator: (value) =>
+          requiredIds(value, 'Выберите хотя бы одну дисциплину'),
     ),
   ];
 }

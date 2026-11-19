@@ -88,9 +88,15 @@ class _EntityFormState extends State<EntityForm> {
       if (entry.value.text != (initial is String ? initial : '')) return true;
     }
     for (final field in widget.fields) {
-      if (field is IntChoiceSpec && field.value != widget.initial[field.id]) return true;
-      if (field is StringChoiceSpec && field.value != widget.initial[field.id]) return true;
-      if (field is BoolSpec && field.value != (widget.initial[field.id] as bool? ?? false)) {
+      if (field is IntChoiceSpec && field.value != widget.initial[field.id]) {
+        return true;
+      }
+      if (field is StringChoiceSpec &&
+          field.value != widget.initial[field.id]) {
+        return true;
+      }
+      if (field is BoolSpec &&
+          field.value != (widget.initial[field.id] as bool? ?? false)) {
         return true;
       }
       if (field is MultiSpec) {
@@ -200,7 +206,8 @@ class _EntityFormState extends State<EntityForm> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(widget.title, style: Theme.of(context).textTheme.headlineSmall),
+            Text(widget.title,
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
             for (final field in widget.fields) ...[
               _buildField(field),
@@ -249,7 +256,7 @@ class _EntityFormState extends State<EntityForm> {
       );
     }
     if (field is TextFieldSpec) {
-      return TextFormField(
+      final input = TextFormField(
         controller: _controllers[field.id],
         keyboardType: field.keyboardType,
         maxLines: field.maxLines,
@@ -257,8 +264,18 @@ class _EntityFormState extends State<EntityForm> {
         inputFormatters: field.formatters.isNotEmpty
             ? field.formatters
             : digitFormatters(field.digitsOnly),
-        decoration: InputDecoration(labelText: field.label, hintText: field.hint),
-        validator: (value) => _serverErrors[field.id] ?? field.validator(value, _texts()),
+        decoration:
+            InputDecoration(labelText: field.label, hintText: field.hint),
+        validator: (value) =>
+            _serverErrors[field.id] ?? field.validator(value, _texts()),
+      );
+      if (!field.compact) return input;
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220),
+          child: input,
+        ),
       );
     }
     if (field is IntChoiceSpec) return _intChoice(field);
@@ -288,7 +305,8 @@ class _EntityFormState extends State<EntityForm> {
       items: [
         DropdownMenuItem<int?>(value: null, child: Text(field.emptyLabel)),
         for (final option in field.options)
-          DropdownMenuItem<int?>(value: option.value, child: Text(option.label)),
+          DropdownMenuItem<int?>(
+              value: option.value, child: Text(option.label)),
       ],
       onChanged: (value) {
         widget.onChanged(field.id, value);
@@ -308,7 +326,8 @@ class _EntityFormState extends State<EntityForm> {
       items: [
         DropdownMenuItem<String?>(value: null, child: Text(field.emptyLabel)),
         for (final option in field.options)
-          DropdownMenuItem<String?>(value: option.value, child: Text(option.label)),
+          DropdownMenuItem<String?>(
+              value: option.value, child: Text(option.label)),
       ],
       onChanged: (value) {
         widget.onChanged(field.id, value);

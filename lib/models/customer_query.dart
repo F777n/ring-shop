@@ -29,7 +29,8 @@ class CustomerQuery {
 
   factory CustomerQuery.fromUri(Uri uri) {
     final params = uri.queryParameters;
-    final sort = parseSort(params['sort'], allowed: allowedSort, fallback: 'fullName');
+    final sort =
+        parseSort(params['sort'], allowed: allowedSort, fallback: 'fullName');
     final city = params['city'];
     return CustomerQuery(
       search: params['search'] ?? '',

@@ -53,7 +53,8 @@ class _AdminScreenState extends State<AdminScreen> {
       await _load();
     } on ApiException catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 
@@ -63,12 +64,16 @@ class _AdminScreenState extends State<AdminScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        Text('Администрирование', style: Theme.of(context).textTheme.headlineSmall),
+        Text('Администрирование',
+            style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
-        const Text('Пользователи, роли и сводка. Этот экран есть только у администратора.'),
+        const Text(
+            'Пользователи, роли и сводка. Этот экран есть только у администратора.'),
         const SizedBox(height: 16),
         if (_loading) const LinearProgressIndicator(),
-        if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        if (_error != null)
+          Text(_error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
         if (stats != null)
           Wrap(
             spacing: 12,
@@ -92,17 +97,22 @@ class _AdminScreenState extends State<AdminScreen> {
               return Card(
                 child: ListTile(
                   title: Text(user.fullName),
-                  subtitle: Text(mine ? '${user.username} · свою роль менять нельзя' : user.username),
+                  subtitle: Text(mine
+                      ? '${user.username} · свою роль менять нельзя'
+                      : user.username),
                   trailing: mine
                       ? Text(roleLabel)
                       : DropdownButton<String>(
                           value: user.role,
                           items: [
                             for (final role in Role.values)
-                              DropdownMenuItem(value: role.name, child: Text(role.label)),
+                              DropdownMenuItem(
+                                  value: role.name, child: Text(role.label)),
                           ],
                           onChanged: (value) {
-                            if (value != null && value != user.role) _role(user, value);
+                            if (value != null && value != user.role) {
+                              _role(user, value);
+                            }
                           },
                         ),
                 ),

@@ -50,13 +50,19 @@ Map<String, dynamic> _pageQuery({
   };
 }
 
-PageResult<T> _page<T>(dynamic data, T Function(Map<String, dynamic>) decode, int size) {
-  final map = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+PageResult<T> _page<T>(
+    dynamic data, T Function(Map<String, dynamic>) decode, int size) {
+  final map =
+      data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
   final raw = map['items'];
   final items = raw is List
-      ? raw.whereType<Map>().map((item) => decode(Map<String, dynamic>.from(item))).toList()
+      ? raw
+          .whereType<Map>()
+          .map((item) => decode(Map<String, dynamic>.from(item)))
+          .toList()
       : <T>[];
-  int number(Object? value, int fallback) => value is int ? value : int.tryParse('$value') ?? fallback;
+  int number(Object? value, int fallback) =>
+      value is int ? value : int.tryParse('$value') ?? fallback;
   return PageResult(
     items: items,
     page: number(map['page'], 1),
@@ -146,7 +152,8 @@ class ApiProductRepository implements ProductRepository {
   @override
   Future<bool> isSkuTaken(String sku, {int? exceptId}) {
     return _api.run(() async {
-      final response = await _api.dio.get('/products/sku-taken', queryParameters: {
+      final response =
+          await _api.dio.get('/products/sku-taken', queryParameters: {
         'sku': sku,
         if (exceptId != null) 'exceptId': exceptId,
       });
@@ -157,7 +164,8 @@ class ApiProductRepository implements ProductRepository {
   @override
   Future<Product> create(Product product) {
     return _api.run(() async {
-      final response = await _api.dio.post('/products', data: _productBody(product));
+      final response =
+          await _api.dio.post('/products', data: _productBody(product));
       return Product.fromJson(_map(response.data));
     });
   }
@@ -165,7 +173,8 @@ class ApiProductRepository implements ProductRepository {
   @override
   Future<Product> update(Product product) {
     return _api.run(() async {
-      final response = await _api.dio.put('/products/${product.id}', data: _productBody(product));
+      final response = await _api.dio
+          .put('/products/${product.id}', data: _productBody(product));
       return Product.fromJson(_map(response.data));
     });
   }
@@ -179,19 +188,22 @@ class ApiProductRepository implements ProductRepository {
   }
 
   @override
-  Future<void> softDelete(int id) => _api.run(() => _api.dio.delete('/products/$id'));
+  Future<void> softDelete(int id) =>
+      _api.run(() => _api.dio.delete('/products/$id'));
 
   @override
-  Future<void> hardDelete(int id) =>
-      _api.run(() => _api.dio.delete('/products/$id', queryParameters: {'hard': true}));
+  Future<void> hardDelete(int id) => _api.run(
+      () => _api.dio.delete('/products/$id', queryParameters: {'hard': true}));
 
   @override
-  Future<void> restore(int id) => _api.run(() => _api.dio.post('/products/$id/restore'));
+  Future<void> restore(int id) =>
+      _api.run(() => _api.dio.post('/products/$id/restore'));
 
   @override
   Future<int> deleteMany(List<int> ids) {
     return _api.run(() async {
-      final response = await _api.dio.post('/products/bulk-delete', data: {'ids': ids});
+      final response =
+          await _api.dio.post('/products/bulk-delete', data: {'ids': ids});
       final deleted = _map(response.data)['deleted'];
       return deleted is int ? deleted : int.tryParse('$deleted') ?? 0;
     });
@@ -270,10 +282,12 @@ class ApiBrandRepository implements BrandRepository {
   Future<Brand?> findById(int id) => _one('/brands/$id', Brand.fromJson);
 
   @override
-  Future<Brand> create(Brand brand) => _write('post', '/brands', brand.toJson());
+  Future<Brand> create(Brand brand) =>
+      _write('post', '/brands', brand.toJson());
 
   @override
-  Future<Brand> update(Brand brand) => _write('put', '/brands/${brand.id}', brand.toJson());
+  Future<Brand> update(Brand brand) =>
+      _write('put', '/brands/${brand.id}', brand.toJson());
 
   Future<Brand> _write(String method, String path, Map<String, dynamic> json) {
     json.remove('id');
@@ -288,19 +302,22 @@ class ApiBrandRepository implements BrandRepository {
   }
 
   @override
-  Future<void> softDelete(int id) => _drop(() => _api.dio.delete('/brands/$id'));
+  Future<void> softDelete(int id) =>
+      _drop(() => _api.dio.delete('/brands/$id'));
 
   @override
-  Future<void> hardDelete(int id) =>
-      _drop(() => _api.dio.delete('/brands/$id', queryParameters: {'hard': true}));
+  Future<void> hardDelete(int id) => _drop(
+      () => _api.dio.delete('/brands/$id', queryParameters: {'hard': true}));
 
   @override
-  Future<void> restore(int id) => _drop(() => _api.dio.post('/brands/$id/restore'));
+  Future<void> restore(int id) =>
+      _drop(() => _api.dio.post('/brands/$id/restore'));
 
   @override
   Future<int> deleteMany(List<int> ids) => _bulk('/brands/bulk-delete', ids);
 
-  Future<Brand?> _one(String path, Brand Function(Map<String, dynamic>) decode) {
+  Future<Brand?> _one(
+      String path, Brand Function(Map<String, dynamic>) decode) {
     return _api.run(() async {
       try {
         final response = await _api.dio.get(path);
@@ -377,23 +394,27 @@ class ApiCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<Category?> findById(int id) => _optional('/categories/$id', Category.fromJson);
+  Future<Category?> findById(int id) =>
+      _optional('/categories/$id', Category.fromJson);
 
   @override
   Future<bool> isCodeTaken(String code, {int? exceptId}) async {
     final needle = code.trim().toLowerCase();
     final rows = await all();
-    return rows.any((item) => item.id != exceptId && item.code.trim().toLowerCase() == needle);
+    return rows.any((item) =>
+        item.id != exceptId && item.code.trim().toLowerCase() == needle);
   }
 
   @override
-  Future<Category> create(Category category) => _save('post', '/categories', category.toJson());
+  Future<Category> create(Category category) =>
+      _save('post', '/categories', category.toJson());
 
   @override
   Future<Category> update(Category category) =>
       _save('put', '/categories/${category.id}', category.toJson());
 
-  Future<Category> _save(String method, String path, Map<String, dynamic> json) {
+  Future<Category> _save(
+      String method, String path, Map<String, dynamic> json) {
     json.remove('id');
     json.remove('deletedAt');
     return _api.run(() async {
@@ -406,19 +427,23 @@ class ApiCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<void> softDelete(int id) => _mutate(() => _api.dio.delete('/categories/$id'));
+  Future<void> softDelete(int id) =>
+      _mutate(() => _api.dio.delete('/categories/$id'));
 
   @override
-  Future<void> hardDelete(int id) =>
-      _mutate(() => _api.dio.delete('/categories/$id', queryParameters: {'hard': true}));
+  Future<void> hardDelete(int id) => _mutate(() =>
+      _api.dio.delete('/categories/$id', queryParameters: {'hard': true}));
 
   @override
-  Future<void> restore(int id) => _mutate(() => _api.dio.post('/categories/$id/restore'));
+  Future<void> restore(int id) =>
+      _mutate(() => _api.dio.post('/categories/$id/restore'));
 
   @override
-  Future<int> deleteMany(List<int> ids) => _bulk('/categories/bulk-delete', ids);
+  Future<int> deleteMany(List<int> ids) =>
+      _bulk('/categories/bulk-delete', ids);
 
-  Future<Category?> _optional(String path, Category Function(Map<String, dynamic>) decode) {
+  Future<Category?> _optional(
+      String path, Category Function(Map<String, dynamic>) decode) {
     return _api.run(() async {
       try {
         final response = await _api.dio.get(path);
@@ -495,7 +520,8 @@ class ApiDisciplineRepository implements DisciplineRepository {
   }
 
   @override
-  Future<Discipline?> findById(int id) => _optional('/disciplines/$id', Discipline.fromJson);
+  Future<Discipline?> findById(int id) =>
+      _optional('/disciplines/$id', Discipline.fromJson);
 
   @override
   Future<Discipline> create(Discipline discipline) =>
@@ -505,7 +531,8 @@ class ApiDisciplineRepository implements DisciplineRepository {
   Future<Discipline> update(Discipline discipline) =>
       _save('put', '/disciplines/${discipline.id}', discipline.toJson());
 
-  Future<Discipline> _save(String method, String path, Map<String, dynamic> json) {
+  Future<Discipline> _save(
+      String method, String path, Map<String, dynamic> json) {
     json.remove('id');
     json.remove('deletedAt');
     return _api.run(() async {
@@ -518,19 +545,23 @@ class ApiDisciplineRepository implements DisciplineRepository {
   }
 
   @override
-  Future<void> softDelete(int id) => _mutate(() => _api.dio.delete('/disciplines/$id'));
+  Future<void> softDelete(int id) =>
+      _mutate(() => _api.dio.delete('/disciplines/$id'));
 
   @override
-  Future<void> hardDelete(int id) =>
-      _mutate(() => _api.dio.delete('/disciplines/$id', queryParameters: {'hard': true}));
+  Future<void> hardDelete(int id) => _mutate(() =>
+      _api.dio.delete('/disciplines/$id', queryParameters: {'hard': true}));
 
   @override
-  Future<void> restore(int id) => _mutate(() => _api.dio.post('/disciplines/$id/restore'));
+  Future<void> restore(int id) =>
+      _mutate(() => _api.dio.post('/disciplines/$id/restore'));
 
   @override
-  Future<int> deleteMany(List<int> ids) => _bulk('/disciplines/bulk-delete', ids);
+  Future<int> deleteMany(List<int> ids) =>
+      _bulk('/disciplines/bulk-delete', ids);
 
-  Future<Discipline?> _optional(String path, Discipline Function(Map<String, dynamic>) decode) {
+  Future<Discipline?> _optional(
+      String path, Discipline Function(Map<String, dynamic>) decode) {
     return _api.run(() async {
       try {
         final response = await _api.dio.get(path);
@@ -578,7 +609,9 @@ class ApiCustomerRepository implements CustomerRepository {
           includeDeleted: query.includeDeleted,
           extra: {
             'city': query.city,
-            'card': query.cardActive == null ? null : (query.cardActive! ? '1' : '0'),
+            'card': query.cardActive == null
+                ? null
+                : (query.cardActive! ? '1' : '0'),
             'yearFrom': query.yearFrom,
             'yearTo': query.yearTo,
           },
@@ -603,23 +636,27 @@ class ApiCustomerRepository implements CustomerRepository {
   }
 
   @override
-  Future<Customer?> findById(int id) => _optional('/customers/$id', Customer.fromJson);
+  Future<Customer?> findById(int id) =>
+      _optional('/customers/$id', Customer.fromJson);
 
   @override
   Future<bool> isEmailTaken(String email, {int? exceptId}) async {
     final needle = email.trim().toLowerCase();
     final rows = await all();
-    return rows.any((item) => item.id != exceptId && item.email.trim().toLowerCase() == needle);
+    return rows.any((item) =>
+        item.id != exceptId && item.email.trim().toLowerCase() == needle);
   }
 
   @override
-  Future<Customer> create(Customer customer) => _save('post', '/customers', customer.toJson());
+  Future<Customer> create(Customer customer) =>
+      _save('post', '/customers', customer.toJson());
 
   @override
   Future<Customer> update(Customer customer) =>
       _save('put', '/customers/${customer.id}', customer.toJson());
 
-  Future<Customer> _save(String method, String path, Map<String, dynamic> json) {
+  Future<Customer> _save(
+      String method, String path, Map<String, dynamic> json) {
     json.remove('id');
     json.remove('deletedAt');
     return _api.run(() async {
@@ -631,25 +668,29 @@ class ApiCustomerRepository implements CustomerRepository {
   }
 
   @override
-  Future<void> softDelete(int id) => _api.run(() => _api.dio.delete('/customers/$id'));
+  Future<void> softDelete(int id) =>
+      _api.run(() => _api.dio.delete('/customers/$id'));
 
   @override
-  Future<void> hardDelete(int id) =>
-      _api.run(() => _api.dio.delete('/customers/$id', queryParameters: {'hard': true}));
+  Future<void> hardDelete(int id) => _api.run(
+      () => _api.dio.delete('/customers/$id', queryParameters: {'hard': true}));
 
   @override
-  Future<void> restore(int id) => _api.run(() => _api.dio.post('/customers/$id/restore'));
+  Future<void> restore(int id) =>
+      _api.run(() => _api.dio.post('/customers/$id/restore'));
 
   @override
   Future<int> deleteMany(List<int> ids) {
     return _api.run(() async {
-      final response = await _api.dio.post('/customers/bulk-delete', data: {'ids': ids});
+      final response =
+          await _api.dio.post('/customers/bulk-delete', data: {'ids': ids});
       final deleted = _map(response.data)['deleted'];
       return deleted is int ? deleted : int.tryParse('$deleted') ?? 0;
     });
   }
 
-  Future<Customer?> _optional(String path, Customer Function(Map<String, dynamic>) decode) {
+  Future<Customer?> _optional(
+      String path, Customer Function(Map<String, dynamic>) decode) {
     return _api.run(() async {
       try {
         final response = await _api.dio.get(path);

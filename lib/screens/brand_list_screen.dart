@@ -89,10 +89,13 @@ class _BrandListScreenState extends State<BrandListScreen> {
           ? PaginationBar(
               page: notifier.result.page,
               totalPages: notifier.result.totalPages,
-              totalLabel: plural(notifier.result.total, 'бренд', 'бренда', 'брендов'),
+              totalLabel:
+                  plural(notifier.result.total, 'бренд', 'бренда', 'брендов'),
               size: query.size,
-              onPage: (page) => goBrandQuery(context, query.copyWith(page: page)),
-              onSize: (size) => goBrandQuery(context, query.copyWith(size: size)),
+              onPage: (page) =>
+                  goBrandQuery(context, query.copyWith(page: page)),
+              onSize: (size) =>
+                  goBrandQuery(context, query.copyWith(size: size)),
             )
           : const SizedBox(height: 48),
     );
@@ -143,7 +146,8 @@ class _BrandListScreenState extends State<BrandListScreen> {
                     digitsOnly: true,
                     keyboardType: TextInputType.number,
                     onDebounced: (value) {
-                      goBrandQuery(context, query.copyWith(yearFrom: _brandYear(value)));
+                      goBrandQuery(
+                          context, query.copyWith(yearFrom: _brandYear(value)));
                     },
                   ),
                 ),
@@ -155,7 +159,8 @@ class _BrandListScreenState extends State<BrandListScreen> {
                     digitsOnly: true,
                     keyboardType: TextInputType.number,
                     onDebounced: (value) {
-                      goBrandQuery(context, query.copyWith(yearTo: _brandYear(value)));
+                      goBrandQuery(
+                          context, query.copyWith(yearTo: _brandYear(value)));
                     },
                   ),
                 ),
@@ -163,7 +168,8 @@ class _BrandListScreenState extends State<BrandListScreen> {
                   label: const Text('Показывать удалённые'),
                   selected: query.includeDeleted,
                   onSelected: (value) {
-                    goBrandQuery(context, query.copyWith(includeDeleted: value));
+                    goBrandQuery(
+                        context, query.copyWith(includeDeleted: value));
                   },
                 ),
                 TextButton.icon(
@@ -250,11 +256,13 @@ class _BrandListScreenState extends State<BrandListScreen> {
           return EmptyView(
             title: 'Ничего не найдено',
             message: 'По этому запросу брендов нет.',
-            actionLabel: query == const BrandQuery() ? null : 'Сбросить фильтры',
+            actionLabel:
+                query == const BrandQuery() ? null : 'Сбросить фильтры',
             onAction: () => goBrandQuery(context, const BrandQuery()),
           );
         }
-        final canSelect = context.watch<AuthNotifier>().can(Operation.softDelete);
+        final canSelect =
+            context.watch<AuthNotifier>().can(Operation.softDelete);
         if (cards) {
           return EntityCardList<Brand>(
             items: notifier.result.items,
@@ -279,7 +287,8 @@ class _BrandListScreenState extends State<BrandListScreen> {
               context,
               query.copyWith(
                 sortField: field,
-                sortAscending: field == query.sortField ? !query.sortAscending : true,
+                sortAscending:
+                    field == query.sortField ? !query.sortAscending : true,
               ),
             );
           },
@@ -302,7 +311,8 @@ class _BrandListScreenState extends State<BrandListScreen> {
             ),
             TableColumnSpec(
               label: 'Специализация',
-              build: (item) => SizedBox(width: 240, child: Text(item.specialization)),
+              build: (item) =>
+                  SizedBox(width: 240, child: Text(item.specialization)),
             ),
           ],
           actions: _actions,
@@ -388,25 +398,29 @@ class _BrandListScreenState extends State<BrandListScreen> {
   }
 
   Future<bool> _blocked(Brand item) async {
-    final count = await context.read<ProductRepository>().countLinked(brandId: item.id);
+    final count =
+        await context.read<ProductRepository>().countLinked(brandId: item.id);
     final message = linkedDeleteMessage(item.name, count);
     if (message == null || !mounted) return false;
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => narrowDialog(AlertDialog(
         title: const Text('Удаление невозможно'),
         content: Text(message),
         actions: [
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Понятно')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Понятно')),
         ],
-      ),
+      )),
     );
     return true;
   }
 
   Future<void> _deleteSelected() async {
     final notifier = context.read<BrandListNotifier>();
-    final picked = notifier.result.items.where((item) => notifier.selected.contains(item.id));
+    final picked = notifier.result.items
+        .where((item) => notifier.selected.contains(item.id));
     for (final item in picked) {
       if (await _blocked(item)) return;
     }

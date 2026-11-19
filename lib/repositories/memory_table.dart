@@ -9,9 +9,10 @@ class MemoryTable<T> {
     this.gate,
   }) : _items = List<T>.of(items) {
     _nextId = _items.fold<int>(0, (max, item) {
-      final id = idOf(item);
-      return id > max ? id : max;
-    }) + 1;
+          final id = idOf(item);
+          return id > max ? id : max;
+        }) +
+        1;
   }
 
   final int Function(T item) idOf;
@@ -54,7 +55,8 @@ class MemoryTable<T> {
     return item;
   }
 
-  Future<void> softDelete(int id, T Function(T item) hide, String missing) async {
+  Future<void> softDelete(
+      int id, T Function(T item) hide, String missing) async {
     await pause();
     final index = _items.indexWhere((row) => idOf(row) == id);
     if (index < 0) throw StateError(missing);
@@ -86,7 +88,8 @@ class MemoryTable<T> {
     await pause();
     var count = 0;
     for (final id in ids) {
-      final index = _items.indexWhere((item) => idOf(item) == id && !isDeleted(item));
+      final index =
+          _items.indexWhere((item) => idOf(item) == id && !isDeleted(item));
       if (index < 0) continue;
       _items[index] = hide(_items[index]);
       count++;

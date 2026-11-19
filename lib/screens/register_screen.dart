@@ -47,7 +47,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
     } on ValidationException catch (error) {
       if (mounted) {
-        setState(() => _error = error.errors.values.join('\n').ifEmpty(error.message));
+        setState(() =>
+            _error = error.errors.values.join('\n').ifEmpty(error.message));
       }
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
@@ -77,7 +78,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Регистрация', style: Theme.of(context).textTheme.headlineSmall),
+                    Text('Регистрация',
+                        style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 8),
                     const Text('Новая учётка получает роль покупателя.'),
                     if (_error != null) ...[
@@ -89,21 +91,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _name,
                       decoration: const InputDecoration(labelText: 'Имя'),
                       validator: (value) =>
-                          value == null || value.trim().length < 2 ? 'Укажите имя' : null,
+                          value == null || value.trim().length < 2
+                              ? 'Укажите имя'
+                              : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _username,
                       decoration: const InputDecoration(labelText: 'Логин'),
                       validator: (value) =>
-                          value == null || value.trim().length < 3 ? 'Логин от 3 символов' : null,
+                          value == null || value.trim().length < 3
+                              ? 'Логин от 3 символов'
+                              : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _password,
                       decoration: const InputDecoration(labelText: 'Пароль'),
                       obscureText: true,
-                      onChanged: (value) => setState(() => _passwordNow = value),
+                      onChanged: (value) =>
+                          setState(() => _passwordNow = value),
                       validator: passwordText,
                     ),
                     const SizedBox(height: 8),
@@ -113,9 +120,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _repeat,
-                      decoration: const InputDecoration(labelText: 'Пароль ещё раз'),
+                      decoration:
+                          const InputDecoration(labelText: 'Пароль ещё раз'),
                       obscureText: true,
-                      validator: (value) => value == _password.text ? null : 'Пароли не совпадают',
+                      validator: (value) => value == _password.text
+                          ? null
+                          : 'Пароли не совпадают',
                     ),
                     const SizedBox(height: 20),
                     FilledButton(

@@ -7,7 +7,8 @@ import '../repositories/directory_repositories.dart';
 import '../repositories/product_repository.dart';
 
 class ProductDetailsNotifier extends ChangeNotifier {
-  ProductDetailsNotifier(this._products, this._brands, this._categories, this._disciplines);
+  ProductDetailsNotifier(
+      this._products, this._brands, this._categories, this._disciplines);
 
   final ProductRepository _products;
   final BrandRepository _brands;
@@ -41,8 +42,10 @@ class ProductDetailsNotifier extends ChangeNotifier {
       final disciplineList = await _disciplines.all();
       product = found;
       brandName = brand?.name ?? 'Бренд #${found.brandId}';
-      categories = _names(found.categoryIds, categoryList.map((item) => (item.id, item.name)));
-      disciplines = _names(found.disciplineIds, disciplineList.map((item) => (item.id, item.name)));
+      categories = _names(
+          found.categoryIds, categoryList.map((item) => (item.id, item.name)));
+      disciplines = _names(found.disciplineIds,
+          disciplineList.map((item) => (item.id, item.name)));
       status = LoadStatus.success;
     } catch (error) {
       this.error = 'Не удалось открыть карточку: $error';

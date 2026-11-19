@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/api_exceptions.dart';
+import '../core/quiet_retry.dart';
 import '../models/brand.dart';
 import '../models/brand_query.dart';
 import '../models/load_status.dart';
@@ -19,6 +20,7 @@ class BrandListNotifier extends ChangeNotifier {
   final Set<int> _selected = {};
   bool _failNext = false;
   int _ticket = 0;
+  final _retry = QuietRetry();
 
   BrandQuery get query => _query;
   PageResult<Brand> get result => _result;
@@ -27,11 +29,15 @@ class BrandListNotifier extends ChangeNotifier {
   Set<int> get selected => Set.unmodifiable(_selected);
   bool get hasSelection => _selected.isNotEmpty;
 
-  Future<void> load() async {
+  Future<void> load({bool quiet = false}) async {
+    _retry.cancel();
     final ticket = ++_ticket;
-    _status = LoadStatus.loading;
-    _error = null;
-    notifyListeners();
+    if (!quiet) {
+      _status = LoadStatus.loading;
+      _error = null;
+      notifyListeners();
+    }
+    Object? failure;
     try {
       if (_failNext) {
         _failNext = false;
@@ -45,18 +51,28 @@ class BrandListNotifier extends ChangeNotifier {
       return;
     } on ApiException catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } on StateError catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = 'Не удалось загрузить список: $error';
       _status = LoadStatus.error;
     }
+    if (failure != null) _retry.arm(failure, () => load(quiet: true));
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _retry.dispose();
+    super.dispose();
   }
 
   Future<void> applyQuery(BrandQuery next) async {
@@ -98,16 +114,19 @@ class BrandListNotifier extends ChangeNotifier {
 
   Future<void> softDelete(int id) {
     _selected.remove(id);
-    return _mutate(() => _repository.softDelete(id), 'Не удалось скрыть бренд.');
+    return _mutate(
+        () => _repository.softDelete(id), 'Не удалось скрыть бренд.');
   }
 
   Future<void> hardDelete(int id) {
     _selected.remove(id);
-    return _mutate(() => _repository.hardDelete(id), 'Не удалось удалить бренд.');
+    return _mutate(
+        () => _repository.hardDelete(id), 'Не удалось удалить бренд.');
   }
 
   Future<void> restore(int id) {
-    return _mutate(() => _repository.restore(id), 'Не удалось восстановить бренд.');
+    return _mutate(
+        () => _repository.restore(id), 'Не удалось восстановить бренд.');
   }
 
   Future<void> _mutate(

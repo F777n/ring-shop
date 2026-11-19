@@ -27,7 +27,8 @@ class DisciplineQuery {
 
   factory DisciplineQuery.fromUri(Uri uri) {
     final params = uri.queryParameters;
-    final sort = parseSort(params['sort'], allowed: allowedSort, fallback: 'name');
+    final sort =
+        parseSort(params['sort'], allowed: allowedSort, fallback: 'name');
     final country = params['country'];
     return DisciplineQuery(
       search: params['search'] ?? '',

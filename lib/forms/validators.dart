@@ -38,7 +38,8 @@ final digitPattern = RegExp(r'\d');
 final specialPattern = RegExp(r'[^A-Za-zА-Яа-яЁё0-9]');
 
 class PasswordRules {
-  const PasswordRules({required this.length, required this.digit, required this.special});
+  const PasswordRules(
+      {required this.length, required this.digit, required this.special});
 
   final bool length;
   final bool digit;
@@ -116,7 +117,8 @@ String? requiredIds(List<int>? value, String message) {
   return null;
 }
 
-String normalizePhone(String value) => value.replaceAll(RegExp(r'[\s\-()]'), '');
+String normalizePhone(String value) =>
+    value.replaceAll(RegExp(r'[\s\-()]'), '');
 
 String? linkedDeleteMessage(String name, int count) {
   if (count <= 0) return null;

@@ -134,7 +134,12 @@ class ProductDetailsView extends StatelessWidget {
                   Text('Скрыт ${formatDateTime(product.deletedAt!)}'),
                   const SizedBox(height: 12),
                 ],
-                Text(product.name, style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  product.name,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   formatRubles(product.priceRub),
@@ -153,7 +158,8 @@ class ProductDetailsView extends StatelessWidget {
                     ),
                     SizedBox(
                       width: 240,
-                      child: DetailLine(label: 'Год выпуска', value: '${product.year}'),
+                      child: DetailLine(
+                          label: 'Год выпуска', value: '${product.year}'),
                     ),
                     SizedBox(
                       width: 240,
@@ -166,7 +172,8 @@ class ProductDetailsView extends StatelessWidget {
                       width: 240,
                       child: DetailLine(
                         label: 'На складе',
-                        value: '${product.stockAvailable} из ${product.stockTotal}',
+                        value:
+                            '${product.stockAvailable} из ${product.stockTotal}',
                       ),
                     ),
                     SizedBox(
@@ -176,12 +183,16 @@ class ProductDetailsView extends StatelessWidget {
                         children: [
                           Text(
                             'Бренд',
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
                                   color: scheme.onSurfaceVariant,
                                 ),
                           ),
                           TextButton(
-                            onPressed: () => context.go('/brands/${product.brandId}'),
+                            onPressed: () =>
+                                context.go('/brands/${product.brandId}'),
                             child: Text(notifier.brandName),
                           ),
                         ],
@@ -189,11 +200,13 @@ class ProductDetailsView extends StatelessWidget {
                     ),
                     SizedBox(
                       width: 240,
-                      child: DetailLine(label: 'Категории', value: notifier.categories),
+                      child: DetailLine(
+                          label: 'Категории', value: notifier.categories),
                     ),
                     SizedBox(
                       width: 240,
-                      child: DetailLine(label: 'Дисциплины', value: notifier.disciplines),
+                      child: DetailLine(
+                          label: 'Дисциплины', value: notifier.disciplines),
                     ),
                   ],
                 ),
@@ -208,25 +221,31 @@ class ProductDetailsView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (context.watch<AuthNotifier>().can(Operation.manageCatalog))
+                    if (context
+                        .watch<AuthNotifier>()
+                        .can(Operation.manageCatalog))
                       FilledButton.tonalIcon(
-                        onPressed: () => context.go('/products/${product.id}/edit'),
+                        onPressed: () =>
+                            context.go('/products/${product.id}/edit'),
                         icon: const Icon(Icons.edit_outlined),
                         label: const Text('Изменить'),
                       ),
-                    if (!product.isDeleted && context.watch<AuthNotifier>().can(Operation.sell))
+                    if (!product.isDeleted &&
+                        context.watch<AuthNotifier>().can(Operation.sell))
                       FilledButton.tonalIcon(
                         onPressed: () => _sell(context, notifier),
                         icon: const Icon(Icons.point_of_sale_outlined),
                         label: const Text('Продать'),
                       ),
-                    if (!product.isDeleted && context.watch<AuthNotifier>().can(Operation.softDelete))
+                    if (!product.isDeleted &&
+                        context.watch<AuthNotifier>().can(Operation.softDelete))
                       OutlinedButton.icon(
                         onPressed: () => _soft(context, notifier),
                         icon: const Icon(Icons.visibility_off_outlined),
                         label: const Text('Скрыть'),
                       ),
-                    if (product.isDeleted && context.watch<AuthNotifier>().can(Operation.restore))
+                    if (product.isDeleted &&
+                        context.watch<AuthNotifier>().can(Operation.restore))
                       FilledButton.tonalIcon(
                         onPressed: () => _restore(context, notifier),
                         icon: const Icon(Icons.restore),
@@ -234,14 +253,14 @@ class ProductDetailsView extends StatelessWidget {
                       ),
                     if (context.watch<AuthNotifier>().can(Operation.hardDelete))
                       FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: scheme.error,
-                        foregroundColor: scheme.onError,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: scheme.error,
+                          foregroundColor: scheme.onError,
+                        ),
+                        onPressed: () => _hard(context, notifier),
+                        icon: const Icon(Icons.delete_forever_outlined),
+                        label: const Text('Удалить навсегда'),
                       ),
-                      onPressed: () => _hard(context, notifier),
-                      icon: const Icon(Icons.delete_forever_outlined),
-                      label: const Text('Удалить навсегда'),
-                    ),
                   ],
                 ),
               ],
@@ -251,7 +270,8 @@ class ProductDetailsView extends StatelessWidget {
     }
   }
 
-  Future<void> _sell(BuildContext context, ProductDetailsNotifier notifier) async {
+  Future<void> _sell(
+      BuildContext context, ProductDetailsNotifier notifier) async {
     final product = notifier.product;
     if (product == null) return;
     try {
@@ -264,14 +284,17 @@ class ProductDetailsView extends StatelessWidget {
       );
     } on ConflictException catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     } on ApiException catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 
-  Future<void> _soft(BuildContext context, ProductDetailsNotifier notifier) async {
+  Future<void> _soft(
+      BuildContext context, ProductDetailsNotifier notifier) async {
     final name = notifier.product?.name ?? '';
     final ok = await confirmAction(
       context,
@@ -286,14 +309,16 @@ class ProductDetailsView extends StatelessWidget {
     }
   }
 
-  Future<void> _restore(BuildContext context, ProductDetailsNotifier notifier) async {
+  Future<void> _restore(
+      BuildContext context, ProductDetailsNotifier notifier) async {
     final done = await notifier.restore();
     if (done && context.mounted) {
       await context.read<ProductListNotifier>().load();
     }
   }
 
-  Future<void> _hard(BuildContext context, ProductDetailsNotifier notifier) async {
+  Future<void> _hard(
+      BuildContext context, ProductDetailsNotifier notifier) async {
     final name = notifier.product?.name ?? '';
     final ok = await confirmAction(
       context,

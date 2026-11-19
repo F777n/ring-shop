@@ -49,7 +49,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
       await _load();
     } on ApiException catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 
@@ -63,8 +64,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
         const Text('Только покупатель видит свои брони и может продлить срок.'),
         const SizedBox(height: 16),
         if (_loading) const LinearProgressIndicator(),
-        if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-        if (!_loading && _error == null && _items.isEmpty) const Text('Броней нет.'),
+        if (_error != null)
+          Text(_error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        if (!_loading && _error == null && _items.isEmpty)
+          const Text('Броней нет.'),
         for (final order in _items)
           Card(
             child: ListTile(

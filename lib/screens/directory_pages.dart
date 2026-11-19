@@ -29,11 +29,13 @@ class CategoryListScreen extends StatelessWidget {
     return DirectoryBrowser<Category, CategoryQuery>(
       query: query,
       title: 'Категории',
-      subtitle: 'Группы товаров. Удаление запрещено, если категория стоит на товаре.',
+      subtitle:
+          'Группы товаров. Удаление запрещено, если категория стоит на товаре.',
       basePath: '/categories',
       searchHint: 'Название или код',
       emptyText: 'По этому запросу категорий нет.',
-      totalLabel: (total) => plural(total, 'категория', 'категории', 'категорий'),
+      totalLabel: (total) =>
+          plural(total, 'категория', 'категории', 'категорий'),
       remember: (memory, location) => memory.categories = location,
       emptyQuery: const CategoryQuery(),
       searchOf: (item) => item.search,
@@ -43,14 +45,17 @@ class CategoryListScreen extends StatelessWidget {
       sizeOf: (item) => item.size,
       withSearch: (item, value) => item.copyWith(search: value),
       withDeleted: (item, value) => item.copyWith(includeDeleted: value),
-      withSort: (item, field, ascending) => item.copyWith(sortField: field, sortAscending: ascending),
+      withSort: (item, field, ascending) =>
+          item.copyWith(sortField: field, sortAscending: ascending),
       withPage: (item, page, size) => item.copyWith(page: page, size: size),
       idOf: (item) => item.id,
       nameOf: (item) => item.name,
       isDeleted: (item) => item.isDeleted,
       deletedAt: (item) => item.deletedAt,
-      cardText: (item) => '${item.code} · ${item.kind} · ${item.introducedYear}',
-      linksOf: (id) => context.read<ProductRepository>().countLinked(categoryId: id),
+      cardText: (item) =>
+          '${item.code} · ${item.kind} · ${item.introducedYear}',
+      linksOf: (id) =>
+          context.read<ProductRepository>().countLinked(categoryId: id),
       sortCaption: (item) {
         final field = switch (item.sortField) {
           'introducedYear' => 'год',
@@ -66,9 +71,11 @@ class CategoryListScreen extends StatelessWidget {
         ('introducedYear', false, 'Год по убыванию'),
       ],
       columns: [
-        DirectoryColumn(label: 'Название', sortField: 'name', text: (item) => item.name),
+        DirectoryColumn(
+            label: 'Название', sortField: 'name', text: (item) => item.name),
         DirectoryColumn(label: 'Код', text: (item) => item.code),
-        DirectoryColumn(label: 'Группа', sortField: 'kind', text: (item) => item.kind),
+        DirectoryColumn(
+            label: 'Группа', sortField: 'kind', text: (item) => item.kind),
         DirectoryColumn(
           label: 'Год',
           sortField: 'introducedYear',
@@ -86,7 +93,8 @@ class CategoryListScreen extends StatelessWidget {
               value: item.kind,
               items: [
                 const DropdownMenuItem(value: null, child: Text('Все группы')),
-                for (final kind in categoryKinds) DropdownMenuItem(value: kind, child: Text(kind)),
+                for (final kind in categoryKinds)
+                  DropdownMenuItem(value: kind, child: Text(kind)),
               ],
               onChanged: (value) => go(item.copyWith(kind: value)),
             ),
@@ -121,11 +129,13 @@ class DisciplineListScreen extends StatelessWidget {
     return DirectoryBrowser<Discipline, DisciplineQuery>(
       query: query,
       title: 'Дисциплины',
-      subtitle: 'Единоборства, к которым относится товар. Связь многие ко многим.',
+      subtitle:
+          'Единоборства, к которым относится товар. Связь многие ко многим.',
       basePath: '/disciplines',
       searchHint: 'Название или страна',
       emptyText: 'По этому запросу дисциплин нет.',
-      totalLabel: (total) => plural(total, 'дисциплина', 'дисциплины', 'дисциплин'),
+      totalLabel: (total) =>
+          plural(total, 'дисциплина', 'дисциплины', 'дисциплин'),
       remember: (memory, location) => memory.disciplines = location,
       emptyQuery: const DisciplineQuery(),
       searchOf: (item) => item.search,
@@ -135,14 +145,16 @@ class DisciplineListScreen extends StatelessWidget {
       sizeOf: (item) => item.size,
       withSearch: (item, value) => item.copyWith(search: value),
       withDeleted: (item, value) => item.copyWith(includeDeleted: value),
-      withSort: (item, field, ascending) => item.copyWith(sortField: field, sortAscending: ascending),
+      withSort: (item, field, ascending) =>
+          item.copyWith(sortField: field, sortAscending: ascending),
       withPage: (item, page, size) => item.copyWith(page: page, size: size),
       idOf: (item) => item.id,
       nameOf: (item) => item.name,
       isDeleted: (item) => item.isDeleted,
       deletedAt: (item) => item.deletedAt,
       cardText: (item) => '${item.country} · ${item.establishedYear}',
-      linksOf: (id) => context.read<ProductRepository>().countLinked(disciplineId: id),
+      linksOf: (id) =>
+          context.read<ProductRepository>().countLinked(disciplineId: id),
       sortCaption: (item) {
         final field = switch (item.sortField) {
           'country' => 'страна',
@@ -157,8 +169,12 @@ class DisciplineListScreen extends StatelessWidget {
         ('establishedYear', false, 'Год по убыванию'),
       ],
       columns: [
-        DirectoryColumn(label: 'Название', sortField: 'name', text: (item) => item.name),
-        DirectoryColumn(label: 'Страна', sortField: 'country', text: (item) => item.country),
+        DirectoryColumn(
+            label: 'Название', sortField: 'name', text: (item) => item.name),
+        DirectoryColumn(
+            label: 'Страна',
+            sortField: 'country',
+            text: (item) => item.country),
         DirectoryColumn(
           label: 'Год',
           sortField: 'establishedYear',
@@ -186,7 +202,8 @@ class DisciplineListScreen extends StatelessWidget {
               value: item.country,
               items: [
                 const DropdownMenuItem(value: null, child: Text('Все страны')),
-                for (final country in countries) DropdownMenuItem(value: country, child: Text(country)),
+                for (final country in countries)
+                  DropdownMenuItem(value: country, child: Text(country)),
               ],
               onChanged: (value) => go(item.copyWith(country: value)),
             ),
@@ -221,7 +238,8 @@ class CustomerListScreen extends StatelessWidget {
     return DirectoryBrowser<Customer, CustomerQuery>(
       query: query,
       title: 'Клиенты',
-      subtitle: 'Карта клиента редактируется в той же форме, отдельного экрана у неё нет.',
+      subtitle:
+          'Карта клиента редактируется в той же форме, отдельного экрана у неё нет.',
       basePath: '/customers',
       searchHint: 'Имя, почта или номер карты',
       emptyText: 'По этому запросу клиентов нет.',
@@ -235,7 +253,8 @@ class CustomerListScreen extends StatelessWidget {
       sizeOf: (item) => item.size,
       withSearch: (item, value) => item.copyWith(search: value),
       withDeleted: (item, value) => item.copyWith(includeDeleted: value),
-      withSort: (item, field, ascending) => item.copyWith(sortField: field, sortAscending: ascending),
+      withSort: (item, field, ascending) =>
+          item.copyWith(sortField: field, sortAscending: ascending),
       withPage: (item, page, size) => item.copyWith(page: page, size: size),
       idOf: (item) => item.id,
       nameOf: (item) => item.fullName,
@@ -257,8 +276,13 @@ class CustomerListScreen extends StatelessWidget {
         ('birthYear', false, 'Год рождения'),
       ],
       columns: [
-        DirectoryColumn(label: 'Имя', sortField: 'fullName', text: (item) => item.fullName),
-        DirectoryColumn(label: 'Почта', sortField: 'email', text: (item) => item.email, width: 220),
+        DirectoryColumn(
+            label: 'Имя', sortField: 'fullName', text: (item) => item.fullName),
+        DirectoryColumn(
+            label: 'Почта',
+            sortField: 'email',
+            text: (item) => item.email,
+            width: 220),
         DirectoryColumn(label: 'Город', text: (item) => item.city),
         DirectoryColumn(
           label: 'Год',
@@ -438,7 +462,9 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
             ),
             const SizedBox(height: 16),
             if (_status == LoadStatus.loading || _status == LoadStatus.idle)
-              const SizedBox(height: 280, child: LoadingView(message: 'Открываем карточку…'))
+              const SizedBox(
+                  height: 280,
+                  child: LoadingView(message: 'Открываем карточку…'))
             else if (_status == LoadStatus.error)
               ErrorView(message: _error ?? 'Неизвестная ошибка', onRetry: _load)
             else if (_gone)
@@ -464,31 +490,40 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
           children: [
             if (record.deleted) ...[
               const DeletedBadge(),
-              if (record.deletedAt != null) Text('Скрыт ${formatDateTime(record.deletedAt!)}'),
+              if (record.deletedAt != null)
+                Text('Скрыт ${formatDateTime(record.deletedAt!)}'),
               const SizedBox(height: 12),
             ],
-            Text(record.title, style: Theme.of(context).textTheme.headlineSmall),
+            Text(record.title,
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            for (final line in record.lines) DetailLine(label: line.$1, value: line.$2),
+            for (final line in record.lines)
+              DetailLine(label: line.$1, value: line.$2),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                if (context.watch<AuthNotifier>().can(Operation.manageCatalog) ||
-                    context.watch<AuthNotifier>().can(Operation.manageCustomers))
+                if (context
+                        .watch<AuthNotifier>()
+                        .can(Operation.manageCatalog) ||
+                    context
+                        .watch<AuthNotifier>()
+                        .can(Operation.manageCustomers))
                   FilledButton.tonalIcon(
                     onPressed: () => context.go(widget.editPath),
                     icon: const Icon(Icons.edit_outlined),
                     label: const Text('Изменить'),
                   ),
-                if (!record.deleted && context.watch<AuthNotifier>().can(Operation.softDelete))
+                if (!record.deleted &&
+                    context.watch<AuthNotifier>().can(Operation.softDelete))
                   OutlinedButton.icon(
                     onPressed: () => _mutate(soft: true, name: record.title),
                     icon: const Icon(Icons.visibility_off_outlined),
                     label: const Text('Скрыть'),
                   ),
-                if (record.deleted && context.watch<AuthNotifier>().can(Operation.restore))
+                if (record.deleted &&
+                    context.watch<AuthNotifier>().can(Operation.restore))
                   FilledButton.tonalIcon(
                     onPressed: () async {
                       await widget.onRestore(widget.id);
@@ -502,14 +537,14 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
                   ),
                 if (context.watch<AuthNotifier>().can(Operation.hardDelete))
                   FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: scheme.error,
-                    foregroundColor: scheme.onError,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: scheme.error,
+                      foregroundColor: scheme.onError,
+                    ),
+                    onPressed: () => _mutate(soft: false, name: record.title),
+                    icon: const Icon(Icons.delete_forever_outlined),
+                    label: const Text('Удалить навсегда'),
                   ),
-                  onPressed: () => _mutate(soft: false, name: record.title),
-                  icon: const Icon(Icons.delete_forever_outlined),
-                  label: const Text('Удалить навсегда'),
-                ),
               ],
             ),
           ],
@@ -525,13 +560,15 @@ class _RecordDetailsPageState extends State<RecordDetailsPage> {
       if (!mounted) return;
       await showDialog<void>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => narrowDialog(AlertDialog(
           title: const Text('Удаление невозможно'),
           content: Text(blocked),
           actions: [
-            FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Понятно')),
+            FilledButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Понятно')),
           ],
-        ),
+        )),
       );
       return;
     }

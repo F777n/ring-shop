@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+Widget narrowDialog(Widget child) {
+  return ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 480),
+    child: child,
+  );
+}
+
 Future<bool> confirmAction(
   BuildContext context, {
   required String title,
@@ -11,7 +18,7 @@ Future<bool> confirmAction(
     context: context,
     builder: (context) {
       final scheme = Theme.of(context).colorScheme;
-      return AlertDialog(
+      return narrowDialog(AlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
@@ -30,7 +37,7 @@ Future<bool> confirmAction(
             child: Text(confirmLabel),
           ),
         ],
-      );
+      ));
     },
   );
   return result ?? false;
@@ -40,7 +47,7 @@ Future<void> showDeleteHelp(BuildContext context) {
   return showDialog<void>(
     context: context,
     builder: (context) {
-      return AlertDialog(
+      return narrowDialog(AlertDialog(
         title: const Text('Как работает удаление'),
         content: const Text(
           'Логическое удаление записывает в deletedAt текущее время. '
@@ -58,7 +65,7 @@ Future<void> showDeleteHelp(BuildContext context) {
             child: const Text('Понятно'),
           ),
         ],
-      );
+      ));
     },
   );
 }

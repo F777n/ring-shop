@@ -38,7 +38,8 @@ class SpecFormScreen extends StatefulWidget {
   final String fallback;
   final String Function(int id) locationFor;
   final Future<void> Function()? onSaved;
-  final void Function(Map<String, Object?> values, String id, Object? value)? adjust;
+  final void Function(Map<String, Object?> values, String id, Object? value)?
+      adjust;
 
   @override
   State<SpecFormScreen> createState() => _SpecFormScreenState();
@@ -90,7 +91,8 @@ class _SpecFormScreenState extends State<SpecFormScreen> {
       rethrow;
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -104,7 +106,8 @@ class _SpecFormScreenState extends State<SpecFormScreen> {
           padding: const EdgeInsets.all(20),
           children: [
             if (_loading)
-              const SizedBox(height: 320, child: LoadingView(message: 'Открываем форму…'))
+              const SizedBox(
+                  height: 320, child: LoadingView(message: 'Открываем форму…'))
             else if (_error != null)
               ErrorView(message: _error!, onRetry: _load)
             else
@@ -152,7 +155,8 @@ List<int> idValue(Map<String, Object?> values, String key) {
   return const [];
 }
 
-bool boolValue(Map<String, Object?> values, String key, {bool fallback = false}) {
+bool boolValue(Map<String, Object?> values, String key,
+    {bool fallback = false}) {
   final value = values[key];
   return value is bool ? value : fallback;
 }

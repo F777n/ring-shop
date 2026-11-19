@@ -43,7 +43,8 @@ void main() {
     expect(phoneText('+790011100011'), isNotNull);
     expect(calendarDate('2024-02-31'), isNotNull);
     expect(calendarDate('2024-02-15'), isNull);
-    expect(uniqueValue('EV-GL-10', ['ev-gl-10'], 'Такой артикул уже есть'), 'Такой артикул уже есть');
+    expect(uniqueValue('EV-GL-10', ['ev-gl-10'], 'Такой артикул уже есть'),
+        'Такой артикул уже есть');
     expect(linkedDeleteMessage('Everlast', 4), contains('4 товара'));
     expect(linkedDeleteMessage('Everlast', 0), isNull);
   });
@@ -54,7 +55,9 @@ void main() {
         text: raw,
         selection: TextSelection.collapsed(offset: raw.length),
       );
-      return const RuPhoneFormatter().formatEditUpdate(TextEditingValue.empty, value).text;
+      return const RuPhoneFormatter()
+          .formatEditUpdate(TextEditingValue.empty, value)
+          .text;
     }
 
     expect(typed('+7'), '+7');
@@ -99,7 +102,8 @@ void main() {
     expect(broken.notice, contains('повреждены'));
     expect(broken.snapshot.brands, isNotEmpty);
 
-    final oldSchema = CatalogStore.interpret('{"schema":1,"products":[]}', legacyOnly: false);
+    final oldSchema =
+        CatalogStore.interpret('{"schema":1,"products":[]}', legacyOnly: false);
     expect(oldSchema.notice, contains('устарел'));
 
     final parsed = CatalogStore.interpret(

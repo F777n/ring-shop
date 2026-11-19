@@ -43,7 +43,9 @@ class AuthApi {
       final response = await _dio.post(path, data: body);
       final data = response.data;
       if (data is Map<String, dynamic>) return AuthResult.fromJson(data);
-      if (data is Map) return AuthResult.fromJson(Map<String, dynamic>.from(data));
+      if (data is Map) {
+        return AuthResult.fromJson(Map<String, dynamic>.from(data));
+      }
       throw const ServerException('Пустой ответ входа');
     });
   }
@@ -56,7 +58,8 @@ class DeskApi {
 
   Future<List<ShopOrder>> orders() => _list('/orders', ShopOrder.fromJson);
 
-  Future<ShopOrder> extendOrder(int id) => _one('/orders/$id/extend', ShopOrder.fromJson);
+  Future<ShopOrder> extendOrder(int id) =>
+      _one('/orders/$id/extend', ShopOrder.fromJson);
 
   Future<List<ShopSale>> sales() => _list('/sales', ShopSale.fromJson);
 
@@ -67,7 +70,8 @@ class DeskApi {
     });
   }
 
-  Future<ShopSale> closeSale(int id) => _one('/sales/$id/close', ShopSale.fromJson);
+  Future<ShopSale> closeSale(int id) =>
+      _one('/sales/$id/close', ShopSale.fromJson);
 
   Future<List<AccountUser>> users() => _list('/users', AccountUser.fromJson);
 
@@ -85,7 +89,8 @@ class DeskApi {
     });
   }
 
-  Future<List<T>> _list<T>(String path, T Function(Map<String, dynamic>) decode) {
+  Future<List<T>> _list<T>(
+      String path, T Function(Map<String, dynamic>) decode) {
     return guard(() async {
       final response = await _dio.get(path);
       final data = response.data;
@@ -98,9 +103,12 @@ class DeskApi {
     });
   }
 
-  Future<T> _one<T>(String path, T Function(Map<String, dynamic>) decode, {Map<String, dynamic>? body}) {
+  Future<T> _one<T>(String path, T Function(Map<String, dynamic>) decode,
+      {Map<String, dynamic>? body}) {
     return guard(() async {
-      final response = body == null ? await _dio.post(path) : await _dio.post(path, data: body);
+      final response = body == null
+          ? await _dio.post(path)
+          : await _dio.post(path, data: body);
       return decode(_map(response.data));
     });
   }
@@ -127,7 +135,9 @@ class ShopOrder {
 
   factory ShopOrder.fromJson(Map<String, dynamic> json) {
     return ShopOrder(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       productName: '${json['productName'] ?? ''}',
       dueAt: DateTime.tryParse('${json['dueAt']}')?.toLocal() ?? DateTime.now(),
       status: '${json['status'] ?? ''}',
@@ -152,7 +162,9 @@ class ShopSale {
 
   factory ShopSale.fromJson(Map<String, dynamic> json) {
     return ShopSale(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       productName: '${json['productName'] ?? ''}',
       customerName: '${json['customerName'] ?? ''}',
       status: '${json['status'] ?? ''}',
@@ -175,7 +187,9 @@ class AccountUser {
 
   factory AccountUser.fromJson(Map<String, dynamic> json) {
     return AccountUser(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       username: '${json['username'] ?? ''}',
       fullName: '${json['fullName'] ?? ''}',
       role: '${json['role'] ?? ''}',
@@ -199,7 +213,8 @@ class ShopStats {
   final int openSales;
 
   factory ShopStats.fromJson(Map<String, dynamic> json) {
-    int n(String key) => json[key] is int ? json[key] as int : int.tryParse('${json[key]}') ?? 0;
+    int n(String key) =>
+        json[key] is int ? json[key] as int : int.tryParse('${json[key]}') ?? 0;
     return ShopStats(
       products: n('products'),
       brands: n('brands'),

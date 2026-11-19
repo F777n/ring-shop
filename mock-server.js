@@ -4,6 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const port = Number(readArg('--port') || 8080);
+const staticRootArg = readArg('--static');
 const accessTtl = Math.max(30, Number(readArg('--ttl') || 900));
 const sessionTtl = Math.max(120, Number(readArg('--session') || 8 * 60 * 60));
 const tokenSecret = 'ring-shop-practice';
@@ -12,7 +13,15 @@ const allowedOrigins = new Set([
   'http://127.0.0.1:5555',
   'http://localhost:8123',
   'http://127.0.0.1:8123',
+  'http://127.0.0.1:8080',
+  'http://localhost:8080',
+  'https://f777n.github.io',
 ]);
+
+function originAllowed(origin) {
+  if (!origin || !allowedOrigins.has(origin)) return false;
+  return true;
+}
 
 const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, 'api', 'catalog.json'), 'utf8'));
 const db = {
@@ -34,7 +43,7 @@ function send(res, status, body, origin) {
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
-  if (origin && allowedOrigins.has(origin)) {
+  if (originAllowed(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;
     headers.Vary = 'Origin';
   }
@@ -446,13 +455,57 @@ function handleStats(req, res, origin, actor) {
   );
 }
 
+const staticTypes = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.svg': 'image/svg+xml',
+  '.wasm': 'application/wasm',
+  '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.map': 'application/json; charset=utf-8',
+};
+
+function serveStatic(req, res, url) {
+  if (!staticRootArg || (req.method !== 'GET' && req.method !== 'HEAD')) return false;
+  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) return false;
+  const root = path.resolve(staticRootArg);
+  let relative = decodeURIComponent(url.pathname);
+  if (relative.endsWith('/')) relative += 'index.html';
+  const requested = path.resolve(root, `.${relative}`);
+  const fromRoot = path.relative(root, requested);
+  const inside = fromRoot === '' || (!fromRoot.startsWith('..') && !path.isAbsolute(fromRoot));
+  const file = inside && fs.existsSync(requested) && fs.statSync(requested).isFile()
+    ? requested
+    : path.join(root, 'index.html');
+  if (!fs.existsSync(file)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Сборка не найдена');
+    return true;
+  }
+  const type = staticTypes[path.extname(file).toLowerCase()] || 'application/octet-stream';
+  res.writeHead(200, { 'Content-Type': type });
+  if (req.method === 'HEAD') {
+    res.end();
+    return true;
+  }
+  fs.createReadStream(file).pipe(res);
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
   const origin = req.headers.origin;
   if (req.method === 'OPTIONS') {
-    if (origin && !allowedOrigins.has(origin)) return send(res, 403, { message: 'CORS' }, null);
+    if (origin && !originAllowed(origin)) return send(res, 403, { message: 'CORS' }, null);
     return send(res, 204, null, origin);
   }
   const url = new URL(req.url, `http://127.0.0.1:${port}`);
+  if (serveStatic(req, res, url)) return;
   const delay = Number(url.searchParams.get('__delay') || 0);
   if (delay > 0) await new Promise((resolve) => setTimeout(resolve, Math.min(delay, 5000)));
   const fail = Number(url.searchParams.get('__fail') || 0);
@@ -573,4 +626,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, '127.0.0.1', () => {
   console.log(`Учебный API: http://127.0.0.1:${port}/api/__health`);
+  if (staticRootArg) {
+    console.log(`Магазин и API: http://127.0.0.1:${port}/`);
+  }
 });

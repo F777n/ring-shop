@@ -27,7 +27,8 @@ class CategoryQuery {
 
   factory CategoryQuery.fromUri(Uri uri) {
     final params = uri.queryParameters;
-    final sort = parseSort(params['sort'], allowed: allowedSort, fallback: 'name');
+    final sort =
+        parseSort(params['sort'], allowed: allowedSort, fallback: 'name');
     final kind = params['kind'];
     return CategoryQuery(
       search: params['search'] ?? '',

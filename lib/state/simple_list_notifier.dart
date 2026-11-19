@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../core/api_exceptions.dart';
+import '../core/quiet_retry.dart';
 import '../models/load_status.dart';
 import '../models/page_result.dart';
 
@@ -29,6 +30,7 @@ class SimpleListNotifier<T, Q> extends ChangeNotifier {
   final Set<int> _selected = {};
   bool _failNext = false;
   int _ticket = 0;
+  final _retry = QuietRetry();
 
   Q get query => _query;
   PageResult<T> get result => _result;
@@ -37,11 +39,15 @@ class SimpleListNotifier<T, Q> extends ChangeNotifier {
   Set<int> get selected => Set.unmodifiable(_selected);
   bool get hasSelection => _selected.isNotEmpty;
 
-  Future<void> load() async {
+  Future<void> load({bool quiet = false}) async {
+    _retry.cancel();
     final ticket = ++_ticket;
-    _status = LoadStatus.loading;
-    _error = null;
-    notifyListeners();
+    if (!quiet) {
+      _status = LoadStatus.loading;
+      _error = null;
+      notifyListeners();
+    }
+    Object? failure;
     try {
       if (_failNext) {
         _failNext = false;
@@ -55,18 +61,28 @@ class SimpleListNotifier<T, Q> extends ChangeNotifier {
       return;
     } on ApiException catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } on StateError catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = error.message;
       _status = LoadStatus.error;
     } catch (error) {
       if (ticket != _ticket) return;
+      failure = error;
       _error = 'Не удалось загрузить список: $error';
       _status = LoadStatus.error;
     }
+    if (failure != null) _retry.arm(failure, () => load(quiet: true));
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _retry.dispose();
+    super.dispose();
   }
 
   Future<void> applyQuery(Q next) async {

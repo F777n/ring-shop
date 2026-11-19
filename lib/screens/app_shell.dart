@@ -21,7 +21,9 @@ class AppShell extends StatelessWidget {
     final auth = context.watch<AuthNotifier>();
     final sections = _sectionsFor(auth.user?.role ?? Role.buyer);
     final index = _sectionIndex(path, sections);
-    final wide = MediaQuery.sizeOf(context).width >= kTableBreakpoint;
+    final width = MediaQuery.sizeOf(context).width;
+    final sideNav = width >= kSideNavBreakpoint;
+    final labeledRail = width >= kTableBreakpoint;
     final theme = context.watch<ThemeController>();
     final notice = context.watch<StorageNotice>();
     final scheme = Theme.of(context).colorScheme;
@@ -33,124 +35,171 @@ class AppShell extends StatelessWidget {
       warningBefore: const Duration(seconds: 30),
       sessionEnds: auth.sessionEnds,
       onActivity: auth.touch,
-      onInactive: () => auth.logout(reason: 'Сессия завершена из-за неактивности.'),
-      onSessionEnd: () => auth.logout(reason: 'Время сессии истекло. Войдите снова.'),
+      onInactive: () =>
+          auth.logout(reason: 'Сессия завершена из-за неактивности.'),
+      onSessionEnd: () =>
+          auth.logout(reason: 'Время сессии истекло. Войдите снова.'),
       child: Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: scheme.primary,
-                borderRadius: BorderRadius.circular(10),
+        appBar: AppBar(
+          title: Row(
+            children: [
+              Tooltip(
+                message: 'Ринг',
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child:
+                      Icon(Icons.sports_mma, color: scheme.onPrimary, size: 20),
+                ),
               ),
-              child: Icon(Icons.sports_mma, color: scheme.onPrimary, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Ринг'),
-                  if (MediaQuery.sizeOf(context).width >= 720)
-                    Text(
-                      'Магазин боксёрских принадлежностей',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
-                    ),
-                ],
+              const SizedBox(width: 12),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Ринг', overflow: TextOverflow.ellipsis),
+                    if (width >= 720)
+                      Text(
+                        'Магазин боксёрских принадлежностей',
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                      )
+                    else if (person != null && width < 520)
+                      Text(
+                        '${person.fullName} · ${person.role.label}',
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                  ],
+                ),
               ),
+            ],
+          ),
+          actions: [
+            if (person != null && width >= 520)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 180),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        person.fullName,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      Text(
+                        person.role.label,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (person != null)
+              IconButton(
+                tooltip: 'Выйти',
+                onPressed: auth.logout,
+                icon: const Icon(Icons.logout),
+              ),
+            IconButton(
+              tooltip: theme.isDark ? 'Светлая тема' : 'Тёмная тема',
+              onPressed: theme.toggle,
+              icon: Icon(theme.isDark
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined),
             ),
           ],
         ),
-        actions: [
-          if (person != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(person.fullName, style: Theme.of(context).textTheme.labelLarge),
-                  Text(person.role.label, style: Theme.of(context).textTheme.labelSmall),
+        body: Column(
+          children: [
+            if (notice.message != null)
+              MaterialBanner(
+                content: Text(notice.message!),
+                actions: [
+                  TextButton(
+                      onPressed: notice.dismiss, child: const Text('Скрыть')),
                 ],
               ),
+            Expanded(
+              child: sideNav
+                  ? Row(
+                      children: [
+                        NavigationRail(
+                          selectedIndex: index,
+                          extended: labeledRail,
+                          onDestinationSelected: (value) =>
+                              _openSection(context, value, sections),
+                          labelType: NavigationRailLabelType.none,
+                          destinations: [
+                            for (final section in sections)
+                              NavigationRailDestination(
+                                icon: Tooltip(
+                                    message: section.label,
+                                    child: Icon(section.icon)),
+                                selectedIcon: Tooltip(
+                                  message: section.label,
+                                  child: Icon(section.selected),
+                                ),
+                                label: Text(section.label),
+                              ),
+                          ],
+                        ),
+                        const VerticalDivider(width: 1),
+                        Expanded(child: _bounded(child)),
+                      ],
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _bounded(child),
+                    ),
             ),
-          if (person != null)
-            IconButton(
-              tooltip: 'Выйти',
-              onPressed: auth.logout,
-              icon: const Icon(Icons.logout),
-            ),
-          IconButton(
-            tooltip: theme.isDark ? 'Светлая тема' : 'Тёмная тема',
-            onPressed: theme.toggle,
-            icon: Icon(theme.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          if (notice.message != null)
-            MaterialBanner(
-              content: Text(notice.message!),
-              actions: [
-                TextButton(onPressed: notice.dismiss, child: const Text('Скрыть')),
-              ],
-            ),
-          Expanded(
-            child: wide
-                ? Row(
-                    children: [
-                      NavigationRail(
-                        selectedIndex: index,
-                        onDestinationSelected: (value) => _openSection(context, value, sections),
-                        labelType: NavigationRailLabelType.all,
-                        destinations: [
-                          for (final section in sections)
-                            NavigationRailDestination(
-                              icon: Icon(section.icon),
-                              selectedIcon: Icon(section.selected),
-                              label: Text(section.label),
-                            ),
-                        ],
-                      ),
-                      const VerticalDivider(width: 1),
-                      Expanded(child: child),
-                    ],
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: child,
-                  ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: wide
-          ? null
-          : NavigationBar(
-              height: 68,
-              selectedIndex: index,
-              onDestinationSelected: (value) => _openSection(context, value, sections),
-              destinations: [
-                for (final section in sections)
-                  NavigationDestination(
-                    icon: Icon(section.icon),
-                    selectedIcon: Icon(section.selected),
-                    label: section.short,
-                  ),
-              ],
-            ),
+          ],
+        ),
+        bottomNavigationBar: sideNav
+            ? null
+            : NavigationBar(
+                height: 68,
+                selectedIndex: index,
+                onDestinationSelected: (value) =>
+                    _openSection(context, value, sections),
+                destinations: [
+                  for (final section in sections)
+                    NavigationDestination(
+                      icon: Icon(section.icon),
+                      selectedIcon: Icon(section.selected),
+                      label: section.short,
+                    ),
+                ],
+              ),
       ),
     );
   }
 
-  Future<void> _openSection(BuildContext context, int index, List<_Section> sections) async {
+  Widget _bounded(Widget child) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+        child: child,
+      ),
+    );
+  }
+
+  Future<void> _openSection(
+      BuildContext context, int index, List<_Section> sections) async {
     final guard = context.read<FormGuard>();
     if (guard.dirty) {
       final ok = await confirmAction(
@@ -181,9 +230,12 @@ class _Section {
   final IconData selected;
 }
 
-const _products = _Section('/products', 'Товары', 'Товары', Icons.inventory_2_outlined, Icons.inventory_2);
-const _brands = _Section('/brands', 'Бренды', 'Бренды', Icons.workspace_premium_outlined, Icons.workspace_premium);
-const _categories = _Section('/categories', 'Категории', 'Катег.', Icons.category_outlined, Icons.category);
+const _products = _Section('/products', 'Товары', 'Товары',
+    Icons.inventory_2_outlined, Icons.inventory_2);
+const _brands = _Section('/brands', 'Бренды', 'Бренды',
+    Icons.workspace_premium_outlined, Icons.workspace_premium);
+const _categories = _Section('/categories', 'Категории', 'Катег.',
+    Icons.category_outlined, Icons.category);
 const _disciplines = _Section(
   '/disciplines',
   'Дисциплины',
@@ -191,15 +243,23 @@ const _disciplines = _Section(
   Icons.sports_martial_arts_outlined,
   Icons.sports_martial_arts,
 );
-const _customers = _Section('/customers', 'Клиенты', 'Клиенты', Icons.badge_outlined, Icons.badge);
-const _orders = _Section('/orders', 'Мои брони', 'Брони', Icons.event_available_outlined, Icons.event_available);
-const _counter = _Section('/counter', 'Касса', 'Касса', Icons.point_of_sale_outlined, Icons.point_of_sale);
-const _admin = _Section('/admin', 'Админ', 'Админ', Icons.admin_panel_settings_outlined, Icons.admin_panel_settings);
+const _customers = _Section(
+    '/customers', 'Клиенты', 'Клиенты', Icons.badge_outlined, Icons.badge);
+const _orders = _Section('/orders', 'Мои брони', 'Брони',
+    Icons.event_available_outlined, Icons.event_available);
+const _counter = _Section('/counter', 'Касса', 'Касса',
+    Icons.point_of_sale_outlined, Icons.point_of_sale);
+const _admin = _Section('/admin', 'Админ', 'Админ',
+    Icons.admin_panel_settings_outlined, Icons.admin_panel_settings);
 
 List<_Section> _sectionsFor(Role role) {
   return [
     _products,
-    if (can(role, Operation.manageCatalog)) ...[_brands, _categories, _disciplines],
+    if (can(role, Operation.manageCatalog)) ...[
+      _brands,
+      _categories,
+      _disciplines
+    ],
     if (can(role, Operation.manageCustomers)) _customers,
     if (can(role, Operation.viewOrders)) _orders,
     if (can(role, Operation.sell)) _counter,

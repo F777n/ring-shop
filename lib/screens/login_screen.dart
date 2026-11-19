@@ -40,7 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Не удалось войти. Проверьте сервер.');
+      if (mounted) {
+        setState(() => _error = 'Не удалось войти. Проверьте сервер.');
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -66,16 +68,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const Icon(Icons.sports_mma, size: 40),
                     const SizedBox(height: 8),
-                    Text('Вход в «Ринг»', style: Theme.of(context).textTheme.headlineSmall),
+                    Text('Вход в «Ринг»',
+                        style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 8),
                     const Text('Магазин боксёрских принадлежностей'),
                     if (notice != null) ...[
                       const SizedBox(height: 16),
-                      Text(notice, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                      Text(notice,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error)),
                     ],
                     if (_error != null) ...[
                       const SizedBox(height: 16),
-                      Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                      Text(_error!,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error)),
                     ],
                     const SizedBox(height: 16),
                     TextFormField(
@@ -83,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: const InputDecoration(labelText: 'Логин'),
                       textInputAction: TextInputAction.next,
                       validator: (value) =>
-                          value == null || value.trim().isEmpty ? 'Укажите логин' : null,
+                          value == null || value.trim().isEmpty
+                              ? 'Укажите логин'
+                              : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -91,8 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: const InputDecoration(labelText: 'Пароль'),
                       obscureText: true,
                       onFieldSubmitted: (_) => _submit(),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Укажите пароль' : null,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Укажите пароль'
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     FilledButton(

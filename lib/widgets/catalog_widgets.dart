@@ -29,7 +29,7 @@ class PageHeader extends StatelessWidget {
         ),
       ],
     );
-    final buttons = Row(mainAxisSize: MainAxisSize.min, children: actions);
+    final buttons = Wrap(spacing: 8, runSpacing: 8, children: actions);
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 700) {
@@ -207,7 +207,11 @@ class DetailLine extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: muted)),
+          Text(label,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(color: muted)),
           const SizedBox(height: 2),
           Text(value, style: Theme.of(context).textTheme.titleMedium),
         ],

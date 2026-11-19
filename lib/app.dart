@@ -30,12 +30,14 @@ import 'theme.dart';
 Widget buildRingApp({CatalogSession? session, Dio? dio, AuthNotifier? auth}) {
   final products = session?.products ??
       (dio == null ? InMemoryProductRepository() : ApiProductRepository(dio));
-  final brands =
-      session?.brands ?? (dio == null ? InMemoryBrandRepository() : ApiBrandRepository(dio));
+  final brands = session?.brands ??
+      (dio == null ? InMemoryBrandRepository() : ApiBrandRepository(dio));
   final categories = session?.categories ??
       (dio == null ? InMemoryCategoryRepository() : ApiCategoryRepository(dio));
   final disciplines = session?.disciplines ??
-      (dio == null ? InMemoryDisciplineRepository() : ApiDisciplineRepository(dio));
+      (dio == null
+          ? InMemoryDisciplineRepository()
+          : ApiDisciplineRepository(dio));
   final customers = session?.customers ??
       (dio == null ? InMemoryCustomerRepository() : ApiCustomerRepository(dio));
   final notice = session?.notice ?? StorageNotice(null);
@@ -117,7 +119,7 @@ class RingApp extends StatelessWidget {
       themeMode: theme.mode,
       routerConfig: router,
       locale: const Locale('ru'),
-      supportedLocales: const [Locale('ru'), Locale('en')],
+      supportedLocales: const [Locale('ru')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

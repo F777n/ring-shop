@@ -46,14 +46,16 @@ class EmptyView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.search_off, size: 48, color: scheme.onSurfaceVariant),
+                Icon(Icons.search_off,
+                    size: 48, color: scheme.onSurfaceVariant),
                 const SizedBox(height: 12),
                 Text(title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(message, textAlign: TextAlign.center),
                 if (actionLabel != null && onAction != null) ...[
                   const SizedBox(height: 16),
-                  FilledButton.tonal(onPressed: onAction, child: Text(actionLabel!)),
+                  FilledButton.tonal(
+                      onPressed: onAction, child: Text(actionLabel!)),
                 ],
               ],
             ),
@@ -87,7 +89,8 @@ class ErrorView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline, size: 48, color: scheme.onErrorContainer),
+                Icon(Icons.error_outline,
+                    size: 48, color: scheme.onErrorContainer),
                 const SizedBox(height: 12),
                 Text(
                   'Список не загрузился',
@@ -98,6 +101,13 @@ class ErrorView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: scheme.onErrorContainer),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Страницу обновлять не нужно. Кнопка «Повторить» запросит данные ещё раз. '
+                  'Если сервер снова ответит, список восстановится сам.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: scheme.onErrorContainer),
                 ),

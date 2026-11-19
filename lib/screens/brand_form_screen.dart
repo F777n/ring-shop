@@ -31,9 +31,12 @@ class BrandFormScreen extends StatelessWidget {
     );
   }
 
-  Future<FormBlueprint> _load(BrandRepository brands, CategoryRepository categories) async {
+  Future<FormBlueprint> _load(
+      BrandRepository brands, CategoryRepository categories) async {
     final brand = id == null ? null : await brands.findById(id!);
-    if (id != null && brand == null) throw StateError('Бренд с номером $id не найден.');
+    if (id != null && brand == null) {
+      throw StateError('Бренд с номером $id не найден.');
+    }
     final categoryList = await categories.all();
     return FormBlueprint(
       title: id == null ? 'Новый бренд' : 'Изменение бренда',
@@ -80,21 +83,26 @@ class BrandFormScreen extends StatelessWidget {
   }
 }
 
-List<FieldSpec> _fields(Map<String, Object?> values, List<Category> categories) {
+List<FieldSpec> _fields(
+    Map<String, Object?> values, List<Category> categories) {
   return [
     TextFieldSpec(
       id: 'name',
       label: 'Название',
       initialValue: textValue(values, 'name'),
       validator: (value, _) =>
-          requiredText(value, message: 'Укажите название') ?? lengthBetween(value, 2, 80),
+          requiredText(value, message: 'Укажите название') ??
+          lengthBetween(value, 2, 80),
     ),
     StringChoiceSpec(
       id: 'country',
       label: 'Страна',
       value: stringValue(values, 'country'),
-      options: [for (final country in brandCountries) ChoiceOption(country, country)],
-      validator: (value) => value == null || value.isEmpty ? 'Выберите страну' : null,
+      options: [
+        for (final country in brandCountries) ChoiceOption(country, country)
+      ],
+      validator: (value) =>
+          value == null || value.isEmpty ? 'Выберите страну' : null,
     ),
     TextFieldSpec(
       id: 'foundedYear',
@@ -102,14 +110,16 @@ List<FieldSpec> _fields(Map<String, Object?> values, List<Category> categories) 
       initialValue: textValue(values, 'foundedYear'),
       digitsOnly: true,
       keyboardType: TextInputType.number,
-      validator: (value, _) => intInRange(value, min: 1800, max: 2026, empty: 'Укажите год'),
+      validator: (value, _) =>
+          intInRange(value, min: 1800, max: 2026, empty: 'Укажите год'),
     ),
     TextFieldSpec(
       id: 'specialization',
       label: 'Специализация',
       initialValue: textValue(values, 'specialization'),
       validator: (value, _) =>
-          requiredText(value, message: 'Опишите специализацию') ?? lengthBetween(value, 2, 80),
+          requiredText(value, message: 'Опишите специализацию') ??
+          lengthBetween(value, 2, 80),
     ),
     TextFieldSpec(
       id: 'email',
@@ -127,7 +137,8 @@ List<FieldSpec> _fields(Map<String, Object?> values, List<Category> categories) 
         for (final category in categories)
           if (!category.isDeleted) ChoiceOption(category.id, category.name),
       ],
-      validator: (value) => requiredIds(value, 'Выберите хотя бы одну категорию'),
+      validator: (value) =>
+          requiredIds(value, 'Выберите хотя бы одну категорию'),
     ),
   ];
 }

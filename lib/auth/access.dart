@@ -17,7 +17,6 @@ enum Role {
       };
 }
 
-
 enum Operation {
   viewCatalog,
   manageCatalog,
@@ -35,7 +34,9 @@ enum Operation {
 bool can(Role role, Operation operation) {
   return switch (operation) {
     Operation.viewCatalog => true,
-    Operation.manageCatalog || Operation.softDelete => role == Role.seller || role == Role.admin,
+    Operation.manageCatalog ||
+    Operation.softDelete =>
+      role == Role.seller || role == Role.admin,
     Operation.sell => role == Role.seller,
     Operation.manageCustomers => role == Role.seller || role == Role.admin,
     Operation.viewOrders || Operation.extendOrder => role == Role.buyer,

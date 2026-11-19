@@ -102,7 +102,8 @@ class _EntityTableState<T> extends State<EntityTable<T>> {
                         DataColumn(
                           label: Text(column.label),
                           numeric: column.numeric,
-                          onSort: column.sortField == null || widget.onSort == null
+                          onSort: column.sortField == null ||
+                                  widget.onSort == null
                               ? null
                               : (_, __) => widget.onSort!(column.sortField!),
                         ),
@@ -115,7 +116,8 @@ class _EntityTableState<T> extends State<EntityTable<T>> {
                           selected: widget.selected.contains(widget.idOf(item)),
                           onSelectChanged: widget.onToggleSelect == null
                               ? null
-                              : (_) => widget.onToggleSelect!(widget.idOf(item)),
+                              : (_) =>
+                                  widget.onToggleSelect!(widget.idOf(item)),
                           color: _rowColor(scheme, item),
                           cells: [
                             for (final column in widget.columns)

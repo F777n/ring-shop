@@ -42,7 +42,8 @@ Dio buildDio({
       onResponse: (response, handler) {
         final status = response.statusCode ?? 0;
         if (kDebugMode) {
-          debugPrint('[API] ${response.requestOptions.method} ${response.requestOptions.uri} → $status');
+          debugPrint(
+              '[API] ${response.requestOptions.method} ${response.requestOptions.uri} → $status');
         }
         if (status >= 400) {
           return handler.reject(

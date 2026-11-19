@@ -50,15 +50,18 @@ class CatalogSnapshot {
       };
 
   factory CatalogSnapshot.fromJson(Map<String, dynamic> json) {
-    List<T> kept<T>(Object? raw, T Function(Map<String, dynamic>) decode, int Function(T) idOf) {
+    List<T> kept<T>(Object? raw, T Function(Map<String, dynamic>) decode,
+        int Function(T) idOf) {
       return readModels(raw, decode).where((item) => idOf(item) > 0).toList();
     }
 
     return CatalogSnapshot(
       products: kept(json['products'], Product.fromJson, (item) => item.id),
       brands: kept(json['brands'], Brand.fromJson, (item) => item.id),
-      categories: kept(json['categories'], Category.fromJson, (item) => item.id),
-      disciplines: kept(json['disciplines'], Discipline.fromJson, (item) => item.id),
+      categories:
+          kept(json['categories'], Category.fromJson, (item) => item.id),
+      disciplines:
+          kept(json['disciplines'], Discipline.fromJson, (item) => item.id),
       customers: kept(json['customers'], Customer.fromJson, (item) => item.id),
     );
   }
@@ -154,14 +157,18 @@ class CatalogSession {
     );
     final gate = PersistGate();
     final session = CatalogSession(
-      products: InMemoryProductRepository(products: restored.snapshot.products, gate: gate),
-      brands: InMemoryBrandRepository(brands: restored.snapshot.brands, gate: gate),
-      categories: InMemoryCategoryRepository(categories: restored.snapshot.categories, gate: gate),
+      products: InMemoryProductRepository(
+          products: restored.snapshot.products, gate: gate),
+      brands:
+          InMemoryBrandRepository(brands: restored.snapshot.brands, gate: gate),
+      categories: InMemoryCategoryRepository(
+          categories: restored.snapshot.categories, gate: gate),
       disciplines: InMemoryDisciplineRepository(
         disciplines: restored.snapshot.disciplines,
         gate: gate,
       ),
-      customers: InMemoryCustomerRepository(customers: restored.snapshot.customers, gate: gate),
+      customers: InMemoryCustomerRepository(
+          customers: restored.snapshot.customers, gate: gate),
       notice: StorageNotice(restored.notice),
     );
     gate.save = () => _write(prefs, session);
@@ -171,9 +178,11 @@ class CatalogSession {
     return session;
   }
 
-  static Future<void> _write(SharedPreferences prefs, CatalogSession session) async {
+  static Future<void> _write(
+      SharedPreferences prefs, CatalogSession session) async {
     try {
-      await prefs.setString(CatalogStore.currentKey, jsonEncode(session.toJson()));
+      await prefs.setString(
+          CatalogStore.currentKey, jsonEncode(session.toJson()));
     } catch (_) {}
   }
 }

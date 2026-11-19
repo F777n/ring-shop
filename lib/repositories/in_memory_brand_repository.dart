@@ -12,8 +12,8 @@ class InMemoryBrandRepository implements BrandRepository {
     this.gate,
   }) : _items = List<Brand>.of(brands ?? buildSeedBrands()) {
     _nextId = _items.fold<int>(0, (max, item) {
-      return item.id > max ? item.id : max;
-    }) +
+          return item.id > max ? item.id : max;
+        }) +
         1;
   }
 
@@ -32,7 +32,8 @@ class InMemoryBrandRepository implements BrandRepository {
   @override
   Future<PageResult<Brand>> find(BrandQuery q) async {
     await Future.delayed(latency);
-    var rows = _items.where((item) => q.includeDeleted || !item.isDeleted).toList();
+    var rows =
+        _items.where((item) => q.includeDeleted || !item.isDeleted).toList();
     final needle = q.search.trim().toLowerCase();
     if (needle.isNotEmpty) {
       rows = rows
@@ -125,7 +126,8 @@ class InMemoryBrandRepository implements BrandRepository {
   Future<int> deleteMany(List<int> ids) async {
     var count = 0;
     for (final id in ids) {
-      final index = _items.indexWhere((item) => item.id == id && !item.isDeleted);
+      final index =
+          _items.indexWhere((item) => item.id == id && !item.isDeleted);
       if (index == -1) continue;
       _items[index] = _items[index].copyWith(deletedAt: DateTime.now());
       count++;

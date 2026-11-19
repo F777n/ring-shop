@@ -31,7 +31,9 @@ class AppUser {
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       username: '${json['username'] ?? ''}',
       fullName: '${json['fullName'] ?? ''}',
       role: Role.parse('${json['role']}') ?? Role.buyer,
@@ -57,13 +59,15 @@ class AuthResult {
     return AuthResult(
       accessToken: '${json['accessToken']}',
       refreshToken: '${json['refreshToken']}',
-      sessionExpiresAt: DateTime.tryParse('${json['sessionExpiresAt']}')?.toLocal() ??
-          DateTime.now().add(const Duration(hours: 8)),
+      sessionExpiresAt:
+          DateTime.tryParse('${json['sessionExpiresAt']}')?.toLocal() ??
+              DateTime.now().add(const Duration(hours: 8)),
       user: user is Map<String, dynamic>
           ? AppUser.fromJson(user)
           : user is Map
               ? AppUser.fromJson(Map<String, dynamic>.from(user))
-              : const AppUser(id: 0, username: '', fullName: '', role: Role.buyer),
+              : const AppUser(
+                  id: 0, username: '', fullName: '', role: Role.buyer),
     );
   }
 }
